@@ -1,4 +1,4 @@
-# 27 — Security, Privacy & Responsible AI
+# 27. Security, Privacy & Responsible AI
 
 Senior AI/ML interviews almost always include a question like *"How would you make this safe?"*, *"What could an attacker do?"* or *"How do you make sure the model is fair?"*.
 This chapter gives you the vocabulary and the structured answers. Related: [04 #7](04-what-if-scenarios.md#7-users-see-documents-they-shouldnt-have-access-to), [04 #15](04-what-if-scenarios.md#15-prompt-injection-a-user-made-the-bot-reveal-its-system-prompt--ignore-rules), [04 #20](04-what-if-scenarios.md#20-outputs-contain-pii-emails-phone-numbers-of-other-customers), [22 §8](22-ai-agents.md#8-safety-human-in-the-loop-sandboxing-permissions).
@@ -46,7 +46,7 @@ This chapter gives you the vocabulary and the structured answers. Related: [04 #
 | **Vector store attacks** | poisoned documents planted to be retrieved; cross-tenant leakage | ingestion controls, provenance, tenant isolation |
 | **Data exfiltration via rendering** | model outputs an image/link URL containing secrets that the client auto-loads | block or proxy external URLs in rendered output |
 
-**Q: Can prompt injection be fully solved today?** No. Say: *"I treat it like phishing — reduce the chance with classifiers and good prompting, but design the system so a successful injection has limited impact."*
+**Q: Can prompt injection be fully solved today?** No. Say: *"I treat it like phishing. I reduce the chance with classifiers and good prompting, but design the system so a successful injection has limited impact."*
 
 ## 3. Attacks on ML models and data
 
@@ -59,13 +59,13 @@ This chapter gives you the vocabulary and the structured answers. Related: [04 #
 **Q: Model extraction (stealing)?** Attacker queries your API many times and trains a copy.
 **Defenses:** rate limits and quotas, detect systematic query patterns, return labels not full probabilities, watermark model outputs, legal terms.
 
-**Q: Membership inference?** Attacker determines whether a specific record was in the training data (privacy leak — e.g., "this patient was in the cancer dataset").
+**Q: Membership inference?** Attacker determines whether a specific record was in the training data (a privacy leak, e.g. "this patient was in the cancer dataset").
 **Defenses:** regularization (overfit models leak more), differential privacy, limit output detail.
 
 **Q: Model inversion / training data extraction?** Reconstruct training data from the model (LLMs can repeat memorized text like emails or keys).
 **Defenses:** deduplicate and scrub PII/secrets from training data, differential privacy, output filters, test for memorization.
 
-**Q: Fraud/abuse adversaries adapt — how is that different?** Attackers change behavior after you deploy (concept drift by design). Use frequent retraining, rules for quick response, red-teaming, and features that are costly for attackers to fake.
+**Q: Fraud and abuse adversaries adapt. How is that different?** Attackers change behavior after you deploy (concept drift by design). Use frequent retraining, rules for quick response, red-teaming, and features that are costly for attackers to fake.
 
 ## 4. Supply chain security
 
@@ -73,7 +73,7 @@ This chapter gives you the vocabulary and the structured answers. Related: [04 #
 **Defenses:**
 - Prefer safe weight formats (e.g., safetensors) over pickle; never load untrusted pickles.
 - Pin versions and hashes of models, datasets and packages; scan dependencies; private mirrors.
-- Model and dataset provenance records (who trained, on what, when) — an "AI bill of materials".
+- Model and dataset provenance records (who trained, on what, when). People call this an "AI bill of materials".
 - Sandboxed evaluation of new third-party models before use.
 - Vendor reviews for model providers (data retention, training on your data, regions).
 
@@ -93,7 +93,7 @@ Use this as a closing list in any design interview:
 
 **Q: What is PII and how do you handle it in ML pipelines?** Personally identifiable information: names, emails, phone numbers, IDs, addresses, plus quasi-identifiers (ZIP + birth date + gender can identify most people). Handle by: detect (regex + NER models), minimize (don't collect what you don't need), mask/tokenize before training and logging, restrict access, set retention, and keep a data inventory.
 
-**Q: Anonymization vs pseudonymization?** Pseudonymization replaces identifiers with tokens but can be reversed with a key → still personal data under many laws. Anonymization makes re-identification practically impossible — hard to achieve; simple removal of names is usually not enough.
+**Q: Anonymization vs pseudonymization?** Pseudonymization replaces identifiers with tokens but can be reversed with a key → still personal data under many laws. Anonymization makes re-identification practically impossible. That is hard to achieve, and simple removal of names is usually not enough.
 
 **Q: k-anonymity?** Each record is indistinguishable from at least k−1 others on quasi-identifiers. Weak against attackers with background knowledge; extended by l-diversity and t-closeness.
 
@@ -105,11 +105,11 @@ Use this as a closing list in any design interview:
 
 **Q: Data protection principles you should mention (GDPR-style)?** Lawful basis/consent, purpose limitation (data collected for X not reused for Y without basis), data minimization, storage limitation, accuracy, security, and individual rights: access, correction, deletion ("right to be forgotten"), objection, and rights around **solely automated decisions with significant effects** (explanation and human review).
 
-**Q: Right to be forgotten in ML — why is it hard?** Data may be in raw storage, feature store, training snapshots, vector indexes, caches, logs, backups, **and inside trained model weights**. Plan: data lineage to find every copy; delete from stores and indexes; retrain on schedule without the data (or use **machine unlearning** techniques — still an active research area); prefer RAG over fine-tuning for personal data so deletion = delete from index.
+**Q: Why is the right to be forgotten hard in ML?** Data may be in raw storage, feature store, training snapshots, vector indexes, caches, logs, backups, **and inside trained model weights**. Plan: data lineage to find every copy; delete from stores and indexes; retrain on schedule without the data (or use **machine unlearning** techniques, which are still an active research area); prefer RAG over fine-tuning for personal data so deletion = delete from index.
 
 **Q: Data residency?** Some data must stay in a specific country/region. Design: region-specific deployments and storage, region-pinned model endpoints, no cross-region logging/replication of that data, vendor contracts covering regions.
 
-**Q: Using third-party LLM APIs with customer data — what do you check?** Data retention, whether data is used for training, encryption, regions, certifications, contractual terms, zero-retention options; redact PII before sending when possible.
+**Q: What do you check before sending customer data to a third-party LLM API?** Data retention, whether data is used for training, encryption, regions, certifications, contractual terms, zero-retention options; redact PII before sending when possible.
 
 ## 7. Fairness
 
@@ -125,10 +125,10 @@ Use this as a closing list in any design interview:
 | **Calibration within groups** | a score of 0.7 means 70% for every group |
 | **Individual fairness** | similar individuals get similar outcomes |
 
-**Q: Can you satisfy all of them?** No — when base rates differ between groups, several of these are mathematically incompatible (impossibility results). You must **choose based on context** with stakeholders and document the choice.
+**Q: Can you satisfy all of them?** No. When base rates differ between groups, several of these are mathematically incompatible (impossibility results). You must **choose based on context** with stakeholders and document the choice.
 
 **Q: How do you mitigate bias?**
-- **Pre-processing:** collect more representative data, reweight/resample, fix biased labels, remove proxy features (carefully — removing the protected attribute alone doesn't remove bias).
+- **Pre-processing:** collect more representative data, reweight/resample, fix biased labels, remove proxy features (carefully: removing the protected attribute alone doesn't remove bias).
 - **In-processing:** fairness constraints or adversarial debiasing during training.
 - **Post-processing:** group-specific thresholds (check legal acceptability), calibration.
 - **Process:** slice-based evaluation before every launch, human review for high-stakes cases, monitoring by group after launch.
@@ -147,7 +147,7 @@ Use this as a closing list in any design interview:
 | **LIME** | fits a simple local model around one prediction; unstable |
 | Permutation importance | global, model-agnostic |
 | Partial dependence / ICE plots | effect of one feature |
-| Counterfactual explanations | "If income were $5k higher, the loan would be approved" — actionable for users |
+| Counterfactual explanations | "If income were $5k higher, the loan would be approved." Users can act on it |
 | Grad-CAM / saliency | which image regions mattered |
 | Attention visualization | not a reliable explanation by itself |
 | LLM citations / reasoning summaries | show sources; reasoning text may not reflect true internal process |
@@ -185,7 +185,7 @@ General-purpose / foundation model providers often have extra duties (technical 
 ## 11. What-if scenarios
 
 ### A user tricked the support chatbot into showing another customer's order details (data breach).
-**Mitigate now:** disable the affected tool or feature, preserve logs, start the incident process (security + legal/privacy — notification duties may apply).
+**Mitigate now:** disable the affected tool or feature, preserve logs, start the incident process (security plus legal/privacy, since notification duties may apply).
 **Causes (ranked):** order-lookup tool trusted an order ID chosen by the model instead of checking the logged-in user; shared cache/memory across users; retrieval without tenant/ACL filters; prompt injection.
 **Isolate:** replay the conversation trace; check which tool call returned the data and what authorization it used.
 **Fix:** authorization in the backend (tool only returns orders owned by the authenticated user), user-scoped caches/memory, ACL pre-filtering, output PII checks.

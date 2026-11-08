@@ -1,7 +1,7 @@
-# 14 — DSA Coding Round (for AI/ML roles)
+# 14. DSA Coding Round (for AI/ML roles)
 
-Most ML/AI engineer loops include 1–2 standard coding rounds (LeetCode-style, usually medium).
-You don't need 500 problems — you need the **~15 patterns**. Learn the pattern, then do 5–8 problems each.
+Most ML/AI engineer loops include 1-2 standard coding rounds (LeetCode-style, usually medium).
+You don't need 500 problems. You need the **~15 patterns**. Learn the pattern, then do 5-8 problems each.
 
 ## The method for every coding question (say it out loud)
 1. **Clarify:** input size, types, edge cases (empty, duplicates, negatives), return format.
@@ -112,8 +112,9 @@ def edit_distance(a, b):
 ## 8-week plan
 | Weeks | Patterns | Daily |
 |---|---|---|
-| 1–2 | 1–4 (hash, pointers, window, prefix) | 2 problems |
-| 3–4 | 5–9 (binary search, stack, heap, lists, trees) | 2 problems |
-| 5–6 | 10–12 (graphs, backtracking, DP) | 2 problems |
-| 7–8 | 13–15 + mixed timed sets | 1 timed mock (45 min, 2 problems) |
-Use a curated list (e.g., "NeetCode 150" / "Blind 75") — it covers these patterns.
+| 1-2 | 1-4 (hash, pointers, window, prefix) | 2 problems |
+| 3-4 | 5-9 (binary search, stack, heap, lists, trees) | 2 problems |
+| 5-6 | 10-12 (graphs, backtracking, DP) | 2 problems |
+| 7-8 | 13-15 + mixed timed sets | 1 timed mock (45 min, 2 problems) |
+
+Use a curated list (e.g., "NeetCode 150" / "Blind 75"). It covers these patterns.

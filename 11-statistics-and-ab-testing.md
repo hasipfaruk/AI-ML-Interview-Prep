@@ -1,4 +1,4 @@
-# 11 — Statistics, Probability & A/B Testing
+# 11. Statistics, Probability & A/B Testing
 
 Asked in ML engineer, data scientist and applied scientist interviews.
 
@@ -20,7 +20,7 @@ Asked in ML engineer, data scientist and applied scientist interviews.
 - **Expectation** is linear: E[X+Y] = E[X] + E[Y] (always, even if dependent).
 - **Variance:** Var(X) = E[X²] − E[X]². Var(aX) = a²Var(X).
 
-**Classic Bayes question:** Disease affects 1% of people. Test is 99% sensitive, 95% specific (5% false positive). You test positive — chance you're sick?
+**Classic Bayes question:** Disease affects 1% of people. Test is 99% sensitive, 95% specific (5% false positive). You test positive. What's the chance you're sick?
 P(sick|+) = (0.99·0.01) / (0.99·0.01 + 0.05·0.99) = 0.0099 / 0.0594 ≈ **16.7%**. Lesson: low base rates → most positives are false (same reason fraud alerts are mostly false).
 
 ## 2. Distributions
@@ -55,7 +55,7 @@ P(sick|+) = (0.99·0.01) / (0.99·0.01 + 0.05·0.99) = 0.0099 / 0.0594 ≈ **16.
 
 **Steps:**
 1. Hypothesis + **primary metric** (e.g., conversion) + **guardrail metrics** (latency, revenue, errors).
-2. Randomization unit (user, not request — avoid same user seeing both).
+2. Randomization unit (user, not request, so the same user never sees both).
 3. **Sample size** via power analysis (baseline rate, minimum detectable effect, α, power).
 4. Run for full weeks (weekday/weekend cycles); **don't peek** and stop early when significant.
 5. Analyze: significance, confidence intervals, segments; check sanity (sample ratio mismatch).
@@ -74,8 +74,8 @@ P(sick|+) = (0.99·0.01) / (0.99·0.01 + 0.05·0.99) = 0.0099 / 0.0594 ≈ **16.
 ## 5. Classic puzzle questions
 - **Expected number of coin flips to get heads?** 2 (geometric, 1/p).
 - **Birthday problem:** 23 people → >50% chance two share a birthday.
-- **Monty Hall:** always switch — 2/3 win chance.
-- **Two children, at least one boy — probability both boys?** 1/3.
+- **Monty Hall:** always switch. You win 2/3 of the time.
+- **Two children, at least one is a boy. Probability both are boys?** 1/3.
 - **Sample from a stream of unknown length uniformly?** Reservoir sampling: keep the i-th item with probability 1/i.
 - **Generate a fair coin from a biased one?** Flip twice: HT → H, TH → T, else repeat.
 
@@ -88,7 +88,7 @@ Novelty effect, peeking/false positive, seasonality, SRM bug, segment mix change
 Simpson's paradox or genuine heterogeneity. Investigate segments; consider targeted rollout; be careful of multiple-comparison false findings.
 
 ### You don't have enough traffic for an A/B test.
-Increase MDE, use variance reduction (CUPED — use pre-experiment metric as covariate), run longer, use more sensitive metrics, interleaving, or Bayesian approaches.
+Increase MDE, use variance reduction (CUPED: use the pre-experiment metric as a covariate), run longer, use more sensitive metrics, interleaving, or Bayesian approaches.
 
 ### Metric moved, but you suspect it's not from your change.
 Check A/A test, seasonality, other concurrent experiments, logging changes, external events.

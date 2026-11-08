@@ -1,11 +1,11 @@
-# 05 — Case Studies: Full Interview Answers
+# 05. Case Studies: Full Interview Answers
 
 Each case follows the same 7-step structure you should use in the interview (see [06-interview-playbook.md](06-interview-playbook.md)):
 
 > **1. Requirements → 2. Estimates → 3. API → 4. High-level design → 5. Data model → 6. Deep dives → 7. What-ifs & trade-offs**
 
 ### AI/ML cases
-1. [Enterprise RAG assistant (multi-tenant)](#1-enterprise-rag-assistant-multi-tenant) ⭐ most asked
+1. [Enterprise RAG assistant (multi-tenant)](#1-enterprise-rag-assistant-multi-tenant) (most asked)
 2. [Customer-support AI agent](#2-customer-support-ai-agent)
 3. [LLM gateway / internal LLM platform](#3-llm-gateway--internal-llm-platform)
 4. [Recommendation system (video/product feed)](#4-recommendation-system)
@@ -28,7 +28,7 @@ Each case follows the same 7-step structure you should use in the interview (see
 - Functional: upload/connect docs (PDF, Confluence, Drive), ask questions in chat, answers with citations, follow-up questions, respect document permissions, admin sees usage.
 - Non-functional: answers grounded (low hallucination), p95 time-to-first-token < 2 s, strict tenant isolation, docs searchable within 15 min of update, 99.9% availability, cost control.
 
-**2. Estimates** — 500 companies × 2,000 users × 10 questions/day = 10M/day ≈ 115 QPS avg, ~350 peak. 500 tenants × 200k docs × 20 chunks = 2B chunks → 2B × 3 KB (768-dim fp32) ≈ 6 TB → shard + quantize. Tokens: 10M × 4k ≈ 40B tokens/day → **cost is the #1 concern** → caching, routing.
+**2. Estimates**: 500 companies × 2,000 users × 10 questions/day = 10M/day ≈ 115 QPS avg, ~350 peak. 500 tenants × 200k docs × 20 chunks = 2B chunks → 2B × 3 KB (768-dim fp32) ≈ 6 TB → shard + quantize. Tokens: 10M × 4k ≈ 40B tokens/day → **cost is the #1 concern** → caching, routing.
 
 **3. API**
 ```
@@ -71,7 +71,7 @@ User → API gateway (auth, tenant, rate limit) → Chat service
 - **Cost:** semantic cache for repeated questions per tenant, model routing (simple → small model), context budget, per-tenant quotas.
 - **Evaluation:** per-tenant golden sets from real queries; retrieval recall@k, faithfulness, consistency; thumbs-down sampling to human review; CI eval gate on prompt/model changes.
 
-**7. What-ifs** → see scenarios 1–12 in [04-what-if-scenarios.md](04-what-if-scenarios.md). Be ready for: inconsistent answers, no answer, data leakage between tenants, outdated answers, embedding model migration, provider outage.
+**7. What-ifs** → see scenarios 1-12 in [04-what-if-scenarios.md](04-what-if-scenarios.md). Be ready for: inconsistent answers, no answer, data leakage between tenants, outdated answers, embedding model migration, provider outage.
 
 ---
 
@@ -143,18 +143,18 @@ Training: logged impressions + engagement → daily/continuous training → regi
 ```
 Payment service → Fraud API (p99 < 100ms)
      ├─ Rules engine (hard blocks: blacklisted card, impossible velocity)
-     ├─ Feature fetch: online store (Redis) — real-time aggregates (txns in last 5 min, new device?, distance from last txn)
+     ├─ Feature fetch: online store (Redis): real-time aggregates (txns in last 5 min, new device?, distance from last txn)
      │      ↑ Streaming pipeline (Kafka → Flink) updates aggregates per card/user/merchant
-     ├─ Model (GBDT e.g. XGBoost — fast, strong on tabular; maybe + graph features for fraud rings)
+     ├─ Model (GBDT e.g. XGBoost: fast, strong on tabular; maybe + graph features for fraud rings)
      └─ Decision: score → thresholds (allow / step-up auth (OTP) / block / manual review queue)
-Labels: chargebacks (delayed 30–90 days), analyst reviews → training data (point-in-time features)
+Labels: chargebacks (delayed 30-90 days), analyst reviews → training data (point-in-time features)
 ```
-- **Deep dives:** class imbalance (#27), delayed labels (#26), threshold set by business cost, **fail-open vs fail-closed** if fraud service is down (usually fail-open with rules-only fallback for small amounts — state the trade-off), adversarial drift (#24), explainability (SHAP for analysts).
+- **Deep dives:** class imbalance (#27), delayed labels (#26), threshold set by business cost, **fail-open vs fail-closed** if fraud service is down (usually fail-open with rules-only fallback for small amounts; state the trade-off), adversarial drift (#24), explainability (SHAP for analysts).
 
 ---
 
 ## 6. Semantic search for e-commerce
-> "Users type 'comfortable running shoes for flat feet' — return relevant products."
+> "Users type 'comfortable running shoes for flat feet'. Return relevant products."
 
 - **Design:** query understanding (spell-fix, category/attribute extraction with an LLM or classifier: category=running shoes, feature=arch support) → **hybrid retrieval** (BM25 on title/attributes + vector search on product embeddings) with filters (in stock, price, size) → learning-to-rank model (features: text relevance, popularity, CTR, conversion, price, personalization) → re-rank (diversity, sponsored slots).
 - Indexing: product catalog changes → CDC → update search index (Elasticsearch/OpenSearch with vector support).
@@ -182,7 +182,7 @@ Human decisions → labels → retraining; appeals flow
 > "Extract fields from 1M invoices/month (vendor, date, total, line items)."
 
 - **Design:** upload → object storage → queue → classify doc type → OCR/layout model (or multimodal LLM) → field extraction (structured output with JSON schema) → validation rules (totals sum, date formats, vendor in master data) → confidence score → auto-approve or human review UI → corrections stored as training data → ERP via API.
-- **Estimates:** 1M/month ≈ 0.4/s average — throughput easy; focus on accuracy, cost per document, and review workload.
+- **Estimates:** 1M/month ≈ 0.4/s average, so throughput is easy; focus on accuracy, cost per document, and review workload.
 - **What-ifs:** new invoice layout breaks extraction (drift → human review rises → retrain/few-shot examples), scanned low-quality docs (pre-processing, OCR confidence), duplicate invoices (hash + business key dedupe), LLM returns invalid JSON (#14).
 
 ---

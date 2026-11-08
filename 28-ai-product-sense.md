@@ -1,4 +1,4 @@
-# 28 — AI Product Sense
+# 28. AI Product Sense
 
 Senior AI/ML roles, AI product manager roles and many startup interviews include questions like
 **"How would you measure success of this AI feature?"** or **"Should we build our own LLM?"**
@@ -33,7 +33,7 @@ Use this order for any open product question. Memory trick: **"U-P-S-M-R"** (Use
 | **4. Metrics** | North-star metric, supporting metrics, guardrail metrics. How we'd test it (A/B). |
 | **5. Risks** | Quality failures, safety, privacy, cost, trust. Mitigation for each. |
 
-**Golden sentence:**
+**A sentence you can reuse:**
 > "I'd start from the user problem, not the model. The model is only useful if it changes a user outcome we can measure."
 
 ---
@@ -108,7 +108,7 @@ Strong candidates are willing to say "no ML needed". Use this check:
 
 1. **Wizard of Oz / manual first:** humans do the task behind the scenes to test if users want it.
 2. **Prompt + API prototype** in days; test with internal users.
-3. **Eval set** from real examples before scaling (50–200 cases is enough to start).
+3. **Eval set** from real examples before scaling (50-200 cases is enough to start).
 4. **Limited beta** with clear scope ("only answers HR policy questions").
 5. **Measure, collect failures, improve** (prompt → retrieval → model choice → fine-tune, in that order).
 6. **Expand scope** gradually.
@@ -136,9 +136,9 @@ monthly cost     = cost per request × requests per day × 30
 ### Levers to cut cost (say these after the math)
 | Lever | Typical effect |
 |---|---|
-| Shorter context (better retrieval, fewer chunks, summarize history) | Input tokens down 30–60% |
+| Shorter context (better retrieval, fewer chunks, summarize history) | Input tokens down 30-60% |
 | Prompt / prefix caching for the fixed system prompt | Big discount on repeated tokens |
-| Model routing (small model for easy questions) | 50–80% cost cut on routed traffic |
+| Model routing (small model for easy questions) | 50-80% cost cut on routed traffic |
 | Semantic cache for repeated questions | Removes some calls fully |
 | Limit output length | Output tokens are the most expensive |
 | Batch API for non-urgent work | Often ~50% cheaper |
@@ -266,7 +266,7 @@ High volume, repetitive, measurable, low risk if wrong, data available, a motiva
 ## 13. What-if scenarios (product)
 
 ### Usage of the AI feature spiked at launch, then dropped 70% after 3 weeks.
-Novelty effect, or first experiences were disappointing. Isolate: retention cohorts, satisfaction of returning vs churned users, sample their sessions. Fix: improve quality on top use cases, make value obvious in workflow, remove friction (speed). Prevent: judge launch success on 4–8 week retention, not week 1.
+Novelty effect, or first experiences were disappointing. Isolate: retention cohorts, satisfaction of returning vs churned users, sample their sessions. Fix: improve quality on top use cases, make value obvious in workflow, remove friction (speed). Prevent: judge launch success on 4-8 week retention, not week 1.
 
 ### AI cost is growing faster than revenue.
 Find the cost per active user and the top 5% heaviest users; break down tokens by feature. Fix now: limits for heavy usage, caching, shorter contexts. Long-term: model routing, smaller fine-tuned model, pricing tiers aligned with usage.

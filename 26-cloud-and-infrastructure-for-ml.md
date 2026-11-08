@@ -1,4 +1,4 @@
-# 26 — Cloud & Infrastructure for ML
+# 26. Cloud & Infrastructure for ML
 
 You don't need to be a cloud architect, but ML/AI engineers are expected to know how models run in the cloud, what GPUs cost, and what to do when infrastructure breaks.
 MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-and-llm-systems.md](02-ml-and-llm-systems.md#4-model-serving).
@@ -27,7 +27,7 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 | **Networking** | VPC, subnets, load balancers, DNS | private, secure model endpoints |
 | **IAM** | Identities, roles, policies | who/what can read data, deploy models |
 
-- **Region** = geographic area; **Availability Zone (AZ)** = separate data center inside a region. Deploy across 2–3 AZs for high availability.
+- **Region** = geographic area; **Availability Zone (AZ)** = separate data center inside a region. Deploy across 2-3 AZs for high availability.
 - **Shared responsibility:** the cloud secures the hardware; you secure your data, access, and configuration.
 - **IaaS → PaaS → SaaS:** more managed = less control, less operations work.
 
@@ -57,11 +57,11 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 - **Kubernetes (K8s) basics:** **Pod** (running container(s)), **Deployment** (keeps N pods running, rolling updates), **Service** (stable network address), **Ingress** (HTTP routing), **ConfigMap/Secret**, **Job/CronJob** (batch), **Namespace** (isolation), **node pools** (groups of machines, e.g., GPU pool).
 - **GPU scheduling:** NVIDIA device plugin exposes `nvidia.com/gpu`; request it in pod spec; use **taints/tolerations** so only GPU workloads land on expensive GPU nodes; **MIG / time-slicing** to share one GPU between small models.
 - **Autoscaling:**
-  - **HPA** — more pods based on CPU/GPU/custom metrics (QPS, queue length, latency).
-  - **Cluster autoscaler / Karpenter** — more nodes when pods can't be scheduled.
-  - **KEDA** — scale on events (queue depth), including **scale to zero**.
+  - **HPA:** more pods based on CPU/GPU/custom metrics (QPS, queue length, latency).
+  - **Cluster autoscaler / Karpenter:** more nodes when pods can't be scheduled.
+  - **KEDA:** scale on events (queue depth), including **scale to zero**.
 - **ML serving on K8s:** **KServe**, Seldon, Ray Serve, BentoML, Triton, vLLM/TGI containers. Features: canary rollouts, autoscaling, model versioning, request batching.
-- **Training on K8s:** Kubeflow Training Operator, Ray, Volcano/Kueue (gang scheduling — all GPUs for a distributed job start together or not at all).
+- **Training on K8s:** Kubeflow Training Operator, Ray, Volcano/Kueue (gang scheduling, so all GPUs for a distributed job start together or not at all).
 - **Health probes:** *readiness* (ready for traffic after model loaded) vs *liveness* (restart if stuck). A big model needs a long startup/readiness time or it gets killed in a loop.
 
 ## 4. GPUs for training and inference
@@ -70,12 +70,12 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 | Why GPUs | Thousands of cores for parallel matrix math; high memory bandwidth |
 | Families (examples) | Data-center: A100, H100/H200, B200 (training + big LLM inference); L4, A10G, T4 (cheaper inference) |
 | **Memory is usually the limit** | Model weights + activations + optimizer states (training) or KV cache (LLM inference) |
-| Training memory rule | Full fine-tune with Adam in mixed precision ≈ 16–20 bytes/parameter → 7B model ≈ 120–140 GB → multiple GPUs or LoRA/QLoRA |
+| Training memory rule | Full fine-tune with Adam in mixed precision ≈ 16-20 bytes/parameter → 7B model ≈ 120-140 GB → multiple GPUs or LoRA/QLoRA |
 | Inference memory rule | FP16 = 2 bytes/param (7B ≈ 14 GB) + KV cache; INT4 ≈ 0.5 byte/param |
 | Multi-GPU | Data parallel (DDP), FSDP/ZeRO, tensor & pipeline parallel; fast interconnect (NVLink, InfiniBand) matters |
 | Utilization | Watch GPU util %, memory, SM occupancy; low util usually = data loading bottleneck or small batches |
 | Alternatives | TPUs (GCP), AWS Trainium/Inferentia, CPUs for small models |
-| Cost | GPUs are the biggest ML cost line — idle GPUs are the #1 waste |
+| Cost | GPUs are the biggest ML cost line, and idle GPUs are the #1 waste |
 
 ## 5. Ways to serve models in the cloud
 | Option | Good for | Trade-off |
@@ -89,12 +89,12 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 
 ## 6. Networking & security basics
 - **VPC:** your private network in the cloud. **Public subnet** (internet-facing load balancers) vs **private subnet** (model servers, databases).
-- **Private endpoints / PrivateLink / Private Service Connect:** reach cloud services (storage, LLM APIs) without going over the public internet — often required for sensitive data.
+- **Private endpoints / PrivateLink / Private Service Connect:** reach cloud services (storage, LLM APIs) without going over the public internet. Often required for sensitive data.
 - **Security groups / firewall rules:** allow only needed ports and sources.
 - **API gateway** in front of models: auth, rate limits, quotas, logging.
 - **IAM least privilege:** training job role can read only its dataset bucket; serving role can read only the model registry. Use **workload identity** (no long-lived keys in code).
 - **Encryption:** in transit (TLS) and at rest (KMS-managed keys, customer-managed keys for regulated industries).
-- **Secrets:** in a secrets manager, injected at runtime — never in images, code, notebooks, or prompts.
+- **Secrets:** in a secrets manager, injected at runtime. Never put them in images, code, notebooks, or prompts.
 - **Data residency:** some data must stay in a country/region → choose region and LLM endpoints accordingly.
 
 ## 7. Infrastructure as code & CI/CD
@@ -113,7 +113,7 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 ## 9. Cost optimization
 | Lever | How |
 |---|---|
-| **Spot / preemptible instances** | 60–90% cheaper; for training with checkpointing, batch jobs; not for critical online serving alone |
+| **Spot / preemptible instances** | 60-90% cheaper; for training with checkpointing, batch jobs; not for critical online serving alone |
 | **Reserved instances / savings plans / committed use** | Discount for steady baseline load |
 | **Autoscaling & scale to zero** | No idle GPUs at night; KEDA, serverless |
 | **Right-sizing** | Smaller GPU (L4 vs H100) for inference; CPU for small models |
@@ -157,10 +157,10 @@ MLOps practices are in [13-mlops.md](13-mlops.md); serving patterns in [02-ml-an
 **Fix:** cache weights on node-local SSD or a shared volume, pre-pull images (DaemonSet), bake model into image for small models, use faster storage and parallel download, keep min warm replicas, readiness probe set correctly so traffic waits.
 
 ### An API key / cloud secret was pushed to a public GitHub repo
-**This is an incident — act in minutes:** revoke/rotate the key immediately, check access logs for misuse, remove from git history (but assume it's already copied), check billing for abuse (crypto mining is common). **Prevent:** secret scanning in CI and pre-commit hooks, short-lived credentials via workload identity, no long-lived keys.
+**This is an incident. Act in minutes:** revoke/rotate the key immediately, check access logs for misuse, remove from git history (but assume it's already copied), check billing for abuse (crypto mining is common). **Prevent:** secret scanning in CI and pre-commit hooks, short-lived credentials via workload identity, no long-lived keys.
 
 ### Latency is fine in one AZ but bad in another
 Cross-AZ calls (model in AZ-a, vector DB in AZ-b), noisy neighbours, uneven load balancing. Fix: zone-aware routing, colocate dependent services, check LB health checks.
 
 ### Training job keeps getting killed on spot instances
-Expected behavior — design for it: checkpoint every N minutes, auto-resume, mix of spot + on-demand for the coordinator, diversify instance types.
+This is expected, so design for it: checkpoint every N minutes, auto-resume, mix of spot + on-demand for the coordinator, diversify instance types.

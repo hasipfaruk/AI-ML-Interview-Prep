@@ -1,7 +1,7 @@
-# 20 — Graph Machine Learning
+# 20. Graph Machine Learning
 
 Graphs show up in many interviews in fraud detection, recommendations, social networks, drug discovery, knowledge graphs and GraphRAG.
-Format: **Q → short answer you can say in 30–60 seconds**, then "what if" scenarios at the end.
+Format: **Q → short answer you can say in 30-60 seconds**, then "what if" scenarios at the end.
 
 ### Contents
 1. [Graph basics](#1-graph-basics)
@@ -39,7 +39,7 @@ Format: **Q → short answer you can say in 30–60 seconds**, then "what if" sc
 
 **Q: Degree?** Number of edges of a node. In-degree / out-degree for directed graphs. Real graphs have a **power-law degree distribution**: a few "hub" nodes with huge degree.
 
-**Q: Graph databases?** Neo4j, Amazon Neptune, TigerGraph, JanusGraph — store nodes and edges natively and support traversal queries (Cypher, Gremlin). Use them when the core queries are multi-hop relationships.
+**Q: Graph databases?** Neo4j, Amazon Neptune, TigerGraph, JanusGraph. They store nodes and edges natively and support traversal queries (Cypher, Gremlin). Use them when the core queries are multi-hop relationships.
 
 **Q: Homophily vs heterophily?** Homophily: connected nodes tend to be similar (friends share interests). Heterophily: connected nodes tend to differ (fraudsters connect to normal users). Many simple GNNs assume homophily and do worse on heterophily.
 
@@ -48,22 +48,22 @@ Format: **Q → short answer you can say in 30–60 seconds**, then "what if" sc
 | Level | Task | Example |
 |---|---|---|
 | **Node** | classify / regress a node | Is this account a fraudster? |
-| **Edge (link)** | predict if an edge exists / its type | Will user buy item? Friend suggestion? Drug–target interaction? |
+| **Edge (link)** | predict if an edge exists / its type | Will user buy item? Friend suggestion? Drug-target interaction? |
 | **Graph** | classify a whole graph | Is this molecule toxic? |
 | **Community** | find groups | Fraud rings, customer segments |
 | **Generation** | create new graphs | New molecules |
 
 **Q: Transductive vs inductive learning?** Transductive: all nodes (including test nodes) are present during training; can't handle new nodes without retraining (e.g., classic node2vec, basic GCN). Inductive: learns a function that works on unseen nodes/graphs (GraphSAGE). **Production systems with new users every minute need inductive models.**
 
-**Q: How do you split data for link prediction?** Hide a fraction of edges as positives for validation/test, sample non-edges as negatives, and make sure hidden edges are **removed from the graph used for message passing** — otherwise the model sees the answer (leakage). For time-based data, split by time.
+**Q: How do you split data for link prediction?** Hide a fraction of edges as positives for validation/test, sample non-edges as negatives, and make sure hidden edges are **removed from the graph used for message passing**. Otherwise the model sees the answer (leakage). For time-based data, split by time.
 
 ## 3. Classic graph features
 
 Before GNNs, and still very strong as features for gradient-boosted trees.
 
-**Q: Degree centrality?** Number of neighbors — popularity.
+**Q: Degree centrality?** Number of neighbors (popularity).
 
-**Q: Betweenness centrality?** How often a node lies on shortest paths between others — "bridges" and brokers. Expensive to compute exactly on big graphs.
+**Q: Betweenness centrality?** How often a node lies on shortest paths between others ("bridges" and brokers). Expensive to compute exactly on big graphs.
 
 **Q: Closeness centrality?** How close a node is to everyone else (inverse of average distance).
 
@@ -71,9 +71,9 @@ Before GNNs, and still very strong as features for gradient-boosted trees.
 
 **Q: Personalized PageRank?** Random walk that restarts at specific seed nodes → scores how close every node is to the seeds. Great for "who is related to these known bad accounts?" and for recommendations.
 
-**Q: Clustering coefficient?** How many of a node's neighbors are also connected to each other — measures tight groups.
+**Q: Clustering coefficient?** How many of a node's neighbors are also connected to each other. It measures tight groups.
 
-**Q: Community detection algorithms?** Louvain / Leiden (maximize modularity, fast, most used), label propagation (very fast), connected components (simplest — often enough for fraud rings that share a device or card).
+**Q: Community detection algorithms?** Louvain / Leiden (maximize modularity, fast, most used), label propagation (very fast), connected components (simplest, and often enough for fraud rings that share a device or card).
 
 **Q: Common neighbors / Jaccard / Adamic-Adar?** Simple link prediction scores: two nodes with many shared neighbors are likely to connect. Strong baselines for friend suggestions.
 
@@ -89,11 +89,11 @@ Before GNNs, and still very strong as features for gradient-boosted trees.
 
 **Q: Limitations of DeepWalk/node2vec?** Transductive (new node → no embedding without retraining), ignore node features, one embedding per node means memory grows with graph size.
 
-**Q: Matrix factorization view?** These methods are approximately factorizing a matrix of node co-occurrence — same idea as collaborative filtering.
+**Q: Matrix factorization view?** These methods are approximately factorizing a matrix of node co-occurrence, the same idea as collaborative filtering.
 
 ## 5. Graph neural networks (GNNs)
 
-**Q: Core idea of a GNN — message passing?** Each layer, every node:
+**Q: Core idea of a GNN: message passing?** Each layer, every node:
 1. collects messages from its neighbors (their current vectors),
 2. **aggregates** them (sum, mean, max, attention),
 3. **updates** its own vector by combining with its previous vector through a small neural network.
@@ -103,11 +103,11 @@ After k layers, a node's vector contains information from its **k-hop neighborho
 h_v(new) = UPDATE( h_v , AGGREGATE( { h_u : u in neighbors(v) } ) )
 ```
 
-**Q: Why not just use a normal neural network on the adjacency matrix?** Graphs have no fixed size or node order. GNNs are **permutation invariant/equivariant** — reordering nodes doesn't change results — and they share weights across nodes.
+**Q: Why not just use a normal neural network on the adjacency matrix?** Graphs have no fixed size or node order. GNNs are **permutation invariant/equivariant** (reordering nodes doesn't change results), and they share weights across nodes.
 
 **Q: GCN (Graph Convolutional Network)?** Aggregates neighbors with a normalized average (by degree), then a linear layer + non-linearity: `H' = σ(D^-½ (A+I) D^-½ H W)`. Simple and strong on homophilous graphs. Transductive in its original form (needs the full graph).
 
-**Q: GraphSAGE?** Samples a fixed number of neighbors per node and learns aggregator functions (mean, pooling, LSTM). **Inductive** — works for new nodes from their features and neighbors. Built for huge graphs (originally Pinterest-scale ideas → PinSage).
+**Q: GraphSAGE?** Samples a fixed number of neighbors per node and learns aggregator functions (mean, pooling, LSTM). **Inductive**: works for new nodes from their features and neighbors. Built for huge graphs (originally Pinterest-scale ideas → PinSage).
 
 **Q: GAT (Graph Attention Network)?** Learns attention weights for each neighbor, so important neighbors matter more. Helps when neighbors vary in relevance.
 
@@ -115,17 +115,17 @@ h_v(new) = UPDATE( h_v , AGGREGATE( { h_u : u in neighbors(v) } ) )
 
 **Q: Heterogeneous GNNs (R-GCN, HAN, HGT)?** Separate weights per edge type / node type, so "bought" and "reviewed" edges are treated differently.
 
-**Q: Temporal GNNs?** For graphs that change over time (transactions): TGN, TGAT — include edge timestamps and memory per node. Important for fraud where order of events matters.
+**Q: Temporal GNNs?** For graphs that change over time (transactions): TGN, TGAT. They include edge timestamps and memory per node. Useful for fraud where order of events matters.
 
-**Q: Graph-level prediction — how?** Run message passing, then a **readout/pooling** (sum/mean/max of node vectors, or hierarchical pooling) → classifier.
+**Q: How do you do graph-level prediction?** Run message passing, then a **readout/pooling** (sum/mean/max of node vectors, or hierarchical pooling) → classifier.
 
 **Q: Link prediction with GNN?** Compute node embeddings, then score a pair with dot product or an MLP on [h_u, h_v]. Train with positive edges and sampled negative edges.
 
-**Q: Over-smoothing?** With many layers, all node vectors become similar (every node has averaged over the whole graph) → performance drops. That's why most GNNs use only **2–3 layers**. Fixes: residual/skip connections, jumping knowledge (combine all layers), normalization (PairNorm), DropEdge.
+**Q: Over-smoothing?** With many layers, all node vectors become similar (every node has averaged over the whole graph) → performance drops. That's why most GNNs use only **2-3 layers**. Fixes: residual/skip connections, jumping knowledge (combine all layers), normalization (PairNorm), DropEdge.
 
 **Q: Over-squashing?** Information from many distant nodes gets compressed into a fixed-size vector through bottleneck edges → long-range signals are lost. Fixes: graph rewiring, adding virtual nodes, graph transformers.
 
-**Q: Graph Transformers?** Full attention across nodes with positional encodings from graph structure (Laplacian eigenvectors, random-walk encodings). Handle long-range dependencies but cost O(N²) — used on small/medium graphs (molecules).
+**Q: Graph Transformers?** Full attention across nodes with positional encodings from graph structure (Laplacian eigenvectors, random-walk encodings). Handle long-range dependencies but cost O(N²), so they are used on small/medium graphs (molecules).
 
 **Q: Expressiveness limit of message-passing GNNs?** They can't distinguish some different graphs (bounded by the 1-WL test). Adding node IDs, positional encodings, or subgraph features helps.
 
@@ -138,15 +138,15 @@ h_v(new) = UPDATE( h_v , AGGREGATE( { h_u : u in neighbors(v) } ) )
 |---|---|
 | **Neighbor sampling** (GraphSAGE) | sample e.g. 15 then 10 neighbors per layer |
 | **Cluster-GCN / GraphSAINT** | train on subgraphs (clusters or sampled subgraphs) |
-| **Precomputation (SIGN, SGC)** | precompute aggregated features offline, then a simple MLP — very fast inference |
+| **Precomputation (SIGN, SGC)** | precompute aggregated features offline, then a simple MLP; very fast inference |
 | **Distributed training** | partition graph across machines (DistDGL, PyG distributed) |
 | **Historical embeddings / caching** | reuse stale neighbor embeddings |
 
 **Q: Libraries?** PyTorch Geometric (PyG), DGL, GraphStorm; graph databases or Spark GraphFrames for features.
 
-**Q: Online inference for GNNs — the challenge?** At request time you need the node's neighborhood and their features fast. Options: precompute embeddings in batch (daily/hourly) and store in a feature store/vector DB; for new nodes use an inductive model with sampled neighbors from a graph store; cap neighbor count for latency.
+**Q: Online inference for GNNs: what makes it hard?** At request time you need the node's neighborhood and their features fast. Options: precompute embeddings in batch (daily/hourly) and store in a feature store/vector DB; for new nodes use an inductive model with sampled neighbors from a graph store; cap neighbor count for latency.
 
-**Q: Negative sampling for link prediction?** Random negatives are too easy. Use **hard negatives** (nodes 2–3 hops away, popular items) to make the model learn fine distinctions. Evaluate with ranking metrics (MRR, Hits@K) not just AUC.
+**Q: Negative sampling for link prediction?** Random negatives are too easy. Use **hard negatives** (nodes 2-3 hops away, popular items) to make the model learn fine distinctions. Evaluate with ranking metrics (MRR, Hits@K) not just AUC.
 
 **Q: Class imbalance in node classification (fraud = 0.1%)?** Weighted loss, oversampling minority nodes' neighborhoods, focal loss, threshold tuning, evaluate with PR-AUC. See [07 §8](07-ml-fundamentals.md#8-data-preparation--feature-engineering).
 
@@ -171,7 +171,7 @@ Used for **link prediction / KG completion** (predict missing facts).
 **Q: What is GraphRAG?** RAG that uses a graph built from the documents: extract entities and relations with an LLM, build a KG, optionally detect communities and summarize each, then retrieve **entities + their neighborhoods + community summaries** in addition to (or instead of) text chunks. Plain RAG basics are in [02 §7](02-ml-and-llm-systems.md#7-llm-systems-rag-in-depth).
 
 **Q: When does GraphRAG beat normal vector RAG?**
-- Multi-hop questions ("Which suppliers of our top customer had compliance issues?") — see [04 #10](04-what-if-scenarios.md).
+- Multi-hop questions ("Which suppliers of our top customer had compliance issues?"). See [04 #10](04-what-if-scenarios.md).
 - Global/summary questions over a whole corpus ("What are the main themes in these 5,000 reports?").
 - Domains with many entities and relations (legal, biomedical, supply chain).
 
@@ -184,14 +184,14 @@ Used for **link prediction / KG completion** (predict missing facts).
 | Use case | Graph | Task | Typical approach |
 |---|---|---|---|
 | **Fraud rings** | accounts, devices, cards, IPs, addresses | node classification, community detection | shared-attribute edges → connected components + graph features in XGBoost → GNN (often temporal, heterogeneous) |
-| **Recommendations** | user–item bipartite (+ social) | link prediction | PinSage/LightGCN-style embeddings → ANN candidate generation → ranker. See [05 #4](05-case-studies.md#4-recommendation-system) |
+| **Recommendations** | user-item bipartite (+ social) | link prediction | PinSage/LightGCN-style embeddings → ANN candidate generation → ranker. See [05 #4](05-case-studies.md#4-recommendation-system) |
 | **Social networks** | users, follows | friend suggestion, influence, spam | common neighbors, PPR, GNN embeddings |
 | **Drug discovery** | molecules (atoms/bonds), protein interaction graphs | graph property prediction, link prediction | GIN / graph transformers / KG embeddings |
 | **Supply chain / risk** | companies, suppliers | risk propagation | KG + PageRank-style propagation |
 | **Maps / ETA** | road network | travel time | GNN over road segments |
 | **Search / Q&A** | knowledge graph | entity answers | KG lookup + GraphRAG |
 
-**Mini system design — real-time fraud ring detection:**
+**Mini system design: real-time fraud ring detection**
 ```
 Events (signups, logins, payments) → Kafka → Graph builder (stream)
    → Graph store (accounts ↔ device / card / IP / address edges)
@@ -200,7 +200,7 @@ Events (signups, logins, payments) → Kafka → Graph builder (stream)
    → Offline: daily GNN embeddings (heterogeneous, temporal) → feature store
    → Investigator UI shows the ring visually (explainability)
 ```
-Trade-offs to mention: real-time graph updates vs. batch embeddings, hub nodes (a public Wi-Fi IP connects thousands of honest users — cap or down-weight hubs), privacy of linked data.
+Trade-offs to mention: real-time graph updates vs. batch embeddings, hub nodes (a public Wi-Fi IP connects thousands of honest users, so cap or down-weight hubs), privacy of linked data.
 
 ---
 
@@ -213,20 +213,20 @@ Trade-offs to mention: real-time graph updates vs. batch embeddings, hub nodes (
 **Prevent:** always keep a strong non-graph baseline in the eval.
 
 ### Accuracy drops when you add more GNN layers.
-Over-smoothing (or over-squashing). Keep 2–3 layers, add residual / jumping-knowledge connections, normalization, DropEdge.
+Over-smoothing (or over-squashing). Keep 2-3 layers, add residual / jumping-knowledge connections, normalization, DropEdge.
 
 ### Link prediction AUC is 0.99 offline but recommendations are bad online.
 **Causes:** test edges leaked into the message-passing graph; random negatives are too easy; random split instead of time split; AUC doesn't reflect ranking quality.
 **Fix:** remove test edges from the training graph, time-based split, hard negatives, evaluate with Hits@K / MRR / recall@K on future interactions.
 
 ### Training runs out of GPU memory on a 1-billion-edge graph.
-Neighbor sampling (fanout 10–15 per layer), subgraph training (Cluster-GCN/GraphSAINT), precomputed aggregations (SIGN), store features on CPU/disk with GPU caching, distributed training with graph partitioning.
+Neighbor sampling (fanout 10-15 per layer), subgraph training (Cluster-GCN/GraphSAINT), precomputed aggregations (SIGN), store features on CPU/disk with GPU caching, distributed training with graph partitioning.
 
 ### New users/items get no embedding (cold start).
 Transductive model (node2vec, original GCN). Switch to an **inductive** model (GraphSAGE) that uses node features, or fall back to feature-only embeddings until the node has edges.
 
 ### Fraud graph flags thousands of honest users as one "ring".
-**Cause:** hub nodes — shared public IP, a big office, a payment gateway, a default device ID — connect unrelated users.
+**Cause:** hub nodes (a shared public IP, a big office, a payment gateway, a default device ID) connect unrelated users.
 **Fix:** remove or down-weight high-degree hub nodes, use edge types with stronger meaning (same card > same IP), time windows on edges, human review for large components.
 
 ### Online GNN scoring is too slow (needs 2-hop neighbors in real time).

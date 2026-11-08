@@ -1,8 +1,8 @@
-# 02 — ML & LLM Systems: How They're Actually Built
+# 02. ML & LLM Systems: How They're Actually Built
 
 The interviewer for an AI/ML role wants to see you think **beyond the model**: data, serving, evaluation, monitoring, cost.
 
-> **Golden truth:** In production ML, the model is ~10% of the system. The other 90% is data pipelines, serving, monitoring and feedback loops.
+> **Keep this in mind:** in production ML, the model is ~10% of the system. The other 90% is data pipelines, serving, monitoring and feedback loops.
 
 ### Contents
 1. [The ML lifecycle](#1-the-ml-lifecycle)
@@ -37,7 +37,7 @@ Problem framing → Data collection → Labeling → Feature engineering → Tra
 
 ## 2. Data & features
 - **Feature store** = one place to define features, used by both training (offline store, historical, point-in-time correct) and serving (online store, low latency, e.g., Redis). **Main reason: prevents train/serve skew.**
-- **Point-in-time correctness:** when building training rows, only use feature values that existed *at that time* — otherwise leakage.
+- **Point-in-time correctness:** when building training rows, only use feature values that existed *at that time*. Otherwise you get leakage.
 - **Batch features** (computed daily: "user's purchases last 30 days") vs **real-time features** (streaming: "transactions in last 5 minutes").
 - **Data validation:** schema, null rates, ranges, distribution checks before training.
 - **Data versioning:** DVC, Delta Lake/Iceberg time travel.
@@ -46,7 +46,7 @@ Problem framing → Data collection → Labeling → Feature engineering → Tra
 ## 3. Training infrastructure
 - Orchestration: Airflow / Kubeflow / Prefect / SageMaker pipelines.
 - Experiment tracking: MLflow, Weights & Biases.
-- Distributed training: **data parallel** (copy model, split data — DDP), **model/tensor parallel** (split model across GPUs), **pipeline parallel**, **FSDP/ZeRO** (shard optimizer state + params). Mixed precision (bf16).
+- Distributed training: **data parallel** (copy model, split data; DDP), **model/tensor parallel** (split model across GPUs), **pipeline parallel**, **FSDP/ZeRO** (shard optimizer state + params). Mixed precision (bf16).
 - Checkpointing (resume after spot instance preemption).
 - **Model registry:** versioned artifacts + metadata + stage (staging/production).
 
@@ -95,11 +95,11 @@ Sources (PDF, Confluence, DB, web) → Connectors → Parse (OCR, tables, layout
 | Strategy | Notes |
 |----------|-------|
 | Fixed size (e.g., 500 tokens, 50 overlap) | Simple baseline |
-| Recursive / by structure (headings, paragraphs) | Better coherence — usually best default |
+| Recursive / by structure (headings, paragraphs) | Better coherence, usually the best default |
 | Semantic chunking | Split where topic changes |
 | Parent-child / small-to-big | Retrieve small precise chunk, send bigger parent section to LLM |
 | Per table row / per FAQ item | Structured content |
-Add **contextual headers** to each chunk: "Doc: HR Policy 2025 > Section: Leave > ..." — improves retrieval a lot.
+Add **contextual headers** to each chunk: "Doc: HR Policy 2025 > Section: Leave > ...". This improves retrieval a lot.
 
 ### Online: query pipeline
 ```
@@ -109,25 +109,25 @@ Query → guardrails → (rewrite / expand / decompose / HyDE) → embed
  → prompt (instructions + context + question + cite sources) → LLM → output guardrails + citation check → stream to user
 ```
 **Key techniques to name:**
-- **Hybrid search** — vectors capture meaning, BM25 captures exact words (product codes, names). Combine with **Reciprocal Rank Fusion**.
-- **Reranking** — cross-encoder scores (query, chunk) pairs jointly; big precision boost.
-- **Query rewriting** — turn "what about for contractors?" into a standalone query using chat history.
-- **HyDE** — generate a hypothetical answer, embed it, search with that.
-- **Multi-query** — generate several phrasings, union results.
-- **Metadata filtering** — tenant, permissions, date, doc type. Pre-filter for security.
-- **GraphRAG / knowledge graphs** — for entity-relationship and multi-hop questions.
-- **Agentic RAG** — LLM decides when/what to retrieve iteratively.
+- **Hybrid search**: vectors capture meaning, BM25 captures exact words (product codes, names). Combine with **Reciprocal Rank Fusion**.
+- **Reranking**: cross-encoder scores (query, chunk) pairs jointly; big precision boost.
+- **Query rewriting**: turn "what about for contractors?" into a standalone query using chat history.
+- **HyDE**: generate a hypothetical answer, embed it, search with that.
+- **Multi-query**: generate several phrasings, union results.
+- **Metadata filtering**: tenant, permissions, date, doc type. Pre-filter for security.
+- **GraphRAG / knowledge graphs**: for entity-relationship and multi-hop questions.
+- **Agentic RAG**: LLM decides when/what to retrieve iteratively.
 
 ### Vector DB essentials
 - Similarity: cosine / dot product / L2 (normalize vectors for cosine).
-- ANN indexes: **HNSW** (high recall, fast, RAM heavy), **IVF** (cluster then search nearby clusters), **PQ** (compress vectors, less memory, lower recall). ANN = *approximate* → results can vary slightly → relevant to consistency questions!
+- ANN indexes: **HNSW** (high recall, fast, RAM heavy), **IVF** (cluster then search nearby clusters), **PQ** (compress vectors, less memory, lower recall). ANN = *approximate* → results can vary slightly. This matters for consistency questions.
 - Scaling: sharding, replicas, namespaces per tenant, quantization.
 - Choice: pgvector (already on Postgres, < ~10M vectors), managed (Pinecone), self-hosted (Milvus, Qdrant, Weaviate), Elasticsearch/OpenSearch (if you need hybrid in one system).
 
 ## 8. LLM serving & optimization
 | Technique | What it does |
 |-----------|--------------|
-| **Streaming (SSE)** | Show tokens as generated — lowers perceived latency |
+| **Streaming (SSE)** | Show tokens as they are generated, so the wait feels shorter |
 | **Continuous batching** (vLLM, TGI) | New requests join the batch mid-generation → much higher GPU throughput |
 | **PagedAttention / KV cache** | Efficient memory for attention cache |
 | **Prefix / prompt caching** | Reuse computation for repeated system prompts/context |
@@ -150,7 +150,7 @@ Query → guardrails → (rewrite / expand / decompose / HyDE) → embed
 ## 9. Agents & tool use
 Agent loop: **LLM plans → calls a tool → observes result → repeats → final answer.**
 Design concerns: tool schemas & descriptions, max steps/cost limits, state/memory, error handling, **human-in-the-loop for risky actions**, sandboxing code execution, observability of each step, evaluation of trajectories (did it pick the right tools?), permissions per tool (least privilege).
-Patterns: ReAct, plan-and-execute, router + specialist agents, multi-agent (use only when justified — more agents = more failure points).
+Patterns: ReAct, plan-and-execute, router + specialist agents, multi-agent (use only when you need it; more agents means more failure points).
 
 ## 10. Evaluation of LLM systems
 | Level | Metrics / methods |
@@ -165,7 +165,7 @@ Methods: golden datasets (built from real queries), LLM-as-judge (with rubric, v
 ## 11. Safety, security & governance
 - Input guardrails: prompt-injection detection, topic restriction, PII detection.
 - Output guardrails: toxicity, PII, policy, schema validation, groundedness.
-- **Indirect prompt injection** via retrieved docs/web/email — treat all retrieved content as untrusted.
+- **Indirect prompt injection** via retrieved docs/web/email. Treat all retrieved content as untrusted.
 - Multi-tenant isolation (separate namespaces, ACL pre-filter, scoped caches).
 - Data retention, audit logs, model cards, compliance (GDPR right-to-be-forgotten → must delete from index **and** caches **and** logs; hard for fine-tuned weights → another reason to prefer RAG).
 

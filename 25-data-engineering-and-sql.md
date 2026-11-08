@@ -1,4 +1,4 @@
-# 25 — Data Engineering & SQL
+# 25. Data Engineering & SQL
 
 Almost every ML, data science and AI engineer loop has a SQL round or data pipeline questions. Models are only as good as the data pipelines feeding them.
 
@@ -38,12 +38,12 @@ dim_customer ── fact_orders ── dim_product
               dim_store
 ```
 
-**Q: Fact table grain?** The meaning of one row ("one row per order line"). Always define grain first — wrong grain causes double counting.
+**Q: Fact table grain?** The meaning of one row ("one row per order line"). Always define grain first. A wrong grain causes double counting.
 
 **Q: Slowly Changing Dimensions (SCD)?** How to handle dimension values that change (customer moves city).
 | Type | How | History? |
 |---|---|---|
-| SCD 0 | Never change | — |
+| SCD 0 | Never change | n/a |
 | SCD 1 | Overwrite old value | No |
 | SCD 2 | New row with `valid_from`, `valid_to`, `is_current` | **Yes (most asked)** |
 | SCD 3 | Extra column `previous_city` | Only last change |
@@ -65,7 +65,7 @@ dim_customer ── fact_orders ── dim_product
 | Format | Type | Use |
 |---|---|---|
 | CSV / JSON | Row, text | Exchange, small data; slow, no types |
-| **Parquet** | Columnar, compressed | Analytics/ML — read only needed columns, predicate pushdown |
+| **Parquet** | Columnar, compressed | Analytics/ML: read only needed columns, predicate pushdown |
 | ORC | Columnar | Hive ecosystem |
 | **Avro** | Row, schema embedded | Streaming/Kafka messages, schema evolution |
 | **Delta Lake / Apache Iceberg / Hudi** | Table format over Parquet | ACID transactions, time travel, schema evolution, upserts (MERGE) on data lakes |
@@ -76,17 +76,17 @@ dim_customer ── fact_orders ── dim_product
 - **Batch:** process data in chunks on a schedule (hourly/daily). Simple, cheap, high latency. Spark, dbt, SQL.
 - **Streaming:** process events continuously (seconds). Kafka + Flink / Spark Structured Streaming / Kafka Streams. Needed for fraud, real-time features, live dashboards.
 - **Lambda architecture:** batch layer (accurate) + speed layer (fast) merged. **Kappa:** stream only, reprocess by replaying the log.
-- **ETL:** transform before loading into the warehouse. **ELT:** load raw first, transform inside the warehouse with SQL (dbt). ELT is the modern default (cheap storage, powerful warehouses).
+- **ETL:** transform before loading into the warehouse. **ELT:** load raw first, transform inside the warehouse with SQL (dbt). ELT is the modern default (cheap storage, fast warehouses).
 
 **Streaming concepts to name:**
-- **Event time vs processing time** — when it happened vs when we saw it.
+- **Event time vs processing time:** when it happened vs when we saw it.
 - **Windows:** tumbling (fixed, non-overlapping), sliding (overlapping), session (gap-based).
 - **Watermarks:** how long to wait for late events before closing a window.
 - **Exactly-once:** checkpoints + idempotent/transactional sinks.
 
 ## 5. Orchestration, CDC, partitioning, data quality
-- **Orchestration:** Airflow, Dagster, Prefect — DAGs of tasks, retries, schedules, backfills, dependencies, SLAs.
-- **Idempotent pipelines:** re-running a day gives the same result (overwrite partition `date=2026-11-01`, or MERGE by key). Essential for retries and backfills.
+- **Orchestration:** Airflow, Dagster, Prefect. They run DAGs of tasks, retries, schedules, backfills, dependencies, SLAs.
+- **Idempotent pipelines:** re-running a day gives the same result (overwrite partition `date=2026-11-01`, or MERGE by key). You need this for retries and backfills.
 - **CDC (Change Data Capture):** read the database's change log (e.g., Debezium on Postgres WAL/MySQL binlog) → Kafka → lake/warehouse. Near-real-time copies without heavy queries on production DB.
 - **Partitioning:** split tables by a column (usually date) so queries skip data. **Clustering / bucketing / Z-ordering:** sort data inside partitions for faster filters. Avoid over-partitioning (tiny files).
 - **Data quality checks:** freshness, row counts, nulls, uniqueness, accepted values, referential integrity, distribution checks. Tools: dbt tests, Great Expectations, Soda. **Data contracts** with producers.
@@ -94,7 +94,7 @@ dim_customer ── fact_orders ── dim_product
 
 ## 6. Spark essentials
 - **Driver** plans, **executors** run tasks on **partitions**. Transformations are **lazy**; actions trigger execution.
-- **Narrow** transformations (map, filter) — no data movement. **Wide** (groupBy, join) — **shuffle** across the network (expensive).
+- **Narrow** transformations (map, filter) don't move data. **Wide** ones (groupBy, join) cause a **shuffle** across the network, which is expensive.
 - **Joins:** **broadcast join** when one side is small (send it to every executor, no shuffle); sort-merge join for two big tables.
 - **Data skew:** one key has most rows → one task runs forever. Fixes: salting the key, broadcast join, AQE (adaptive query execution) skew handling.
 - `cache()/persist()` reused DataFrames; avoid `collect()` on big data; prefer built-in functions over Python UDFs.
@@ -118,9 +118,9 @@ dim_customer ── fact_orders ── dim_product
 
 **Q: NULL gotchas?** `NULL = NULL` is not true → use `IS NULL`. `NOT IN (subquery with NULL)` returns no rows → use `NOT EXISTS`. Aggregates ignore NULLs.
 
-**Q: Index — when does it help?** Selective filters, joins, ORDER BY on indexed columns. Doesn't help with functions on the column (`WHERE YEAR(created_at)=2026` → rewrite as a range), leading wildcards (`LIKE '%abc'`), or low-selectivity columns.
+**Q: When does an index help?** Selective filters, joins, ORDER BY on indexed columns. Doesn't help with functions on the column (`WHERE YEAR(created_at)=2026` → rewrite as a range), leading wildcards (`LIKE '%abc'`), or low-selectivity columns.
 
-**Q: CTE vs subquery?** CTE (`WITH x AS (...)`) — same power, more readable, can be recursive.
+**Q: CTE vs subquery?** A CTE (`WITH x AS (...)`) has the same power, reads better, and can be recursive.
 
 **Q: Window function?** Computes over a set of rows related to the current row **without collapsing rows**: `SUM(amount) OVER (PARTITION BY user_id ORDER BY created_at)`.
 
@@ -360,7 +360,7 @@ SELECT * FROM reports;
 
 ### The daily pipeline is late and the 9 AM dashboard/model is stale
 **Causes (ranked):** upstream source late; data volume spike; resource contention (shared cluster); a slow step (skew, bad join); failed task stuck in retries.
-**Isolate:** look at task timeline in the orchestrator — which task got slower? Compare input size vs normal.
+**Isolate:** look at task timeline in the orchestrator. Which task got slower? Compare input size vs normal.
 **Fix now:** rerun the failed part, add resources, publish yesterday's data with a "stale" banner. **Long-term:** SLA alerts on upstream freshness, sensors waiting for data, optimize the slow step, separate compute for critical pipelines.
 **Prevent:** freshness SLOs + alerts *before* consumers notice.
 
@@ -382,7 +382,7 @@ SELECT * FROM reports;
 **Plan:** idempotent job parameterized by date; run in chunks (per month), in parallel within limits; write to a new table/version, validate against old, then swap; don't overload production sources (read from snapshots/replicas); track progress.
 
 ### A Spark join runs forever at 99% (one task stuck)
-**Cause:** **data skew** — one key (e.g., `user_id = NULL` or a huge customer) has most rows.
+**Cause:** **data skew**. One key (e.g., `user_id = NULL` or a huge customer) has most rows.
 **Fix:** filter/handle NULL keys separately, **salt** the skewed key, broadcast the small table, enable AQE skew join.
 
 ### The data lake has millions of tiny files, queries are slow
@@ -395,7 +395,7 @@ SELECT * FROM reports;
 
 ### Training data has future information (leakage) from a pipeline
 **Cause:** joined latest dimension values instead of values at event time.
-**Fix:** SCD2 dimensions + point-in-time joins (feature store) — see [07](07-ml-fundamentals.md#8-data-preparation--feature-engineering).
+**Fix:** SCD2 dimensions + point-in-time joins (feature store). See [07](07-ml-fundamentals.md#8-data-preparation--feature-engineering).
 
 ### Streaming job shows wrong counts because events arrive late
 **Fix:** use event time with watermarks, allow late data updates, and correct with a daily batch reconciliation.

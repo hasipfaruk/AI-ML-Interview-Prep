@@ -1,4 +1,4 @@
-# 24 — Classic System Design Cases (For Any Engineer)
+# 24. Classic System Design Cases (For Any Engineer)
 
 These are the classic "design X" questions asked in backend, full-stack, platform and ML engineer interviews.
 Basics (load balancers, caching, sharding, queues) are in [01-fundamentals.md](01-fundamentals.md). URL shortener, chat app and rate limiter are in [05-case-studies.md](05-case-studies.md#9-url-shortener).
@@ -38,7 +38,7 @@ Every case uses the same 7 steps:
 - Functional: post (text + media), follow users, see a home feed of people you follow (newest or ranked), like/reply.
 - Non-functional: feed loads < 200 ms, highly available (stale by a few seconds is OK), read-heavy (~100 reads per write).
 
-**2. Estimates** — 300M DAU, each opens feed 10×/day → 3B reads/day ≈ 35k QPS (peak ~100k). Posts: 300M × 0.5 = 150M/day ≈ 1.7k writes/s. Post metadata 1 KB → 150 GB/day.
+**2. Estimates:** 300M DAU, each opens feed 10×/day → 3B reads/day ≈ 35k QPS (peak ~100k). Posts: 300M × 0.5 = 150M/day ≈ 1.7k writes/s. Post metadata 1 KB → 150 GB/day.
 
 **3. API**
 ```
@@ -56,12 +56,12 @@ Client → LB → Feed service → read Feed cache → hydrate posts (Post cache
 Follow service → Social graph DB (followers / following)
 ```
 
-**5. Data model** — `posts(post_id, author_id, text, media, created_at)`, `follows(follower_id, followee_id)`, feed cache: `feed:{user_id} → [post_id, ...]` (keep last ~800).
+**5. Data model:** `posts(post_id, author_id, text, media, created_at)`, `follows(follower_id, followee_id)`, feed cache: `feed:{user_id} → [post_id, ...]` (keep last ~800).
 
 **6. Deep dives**
 - **Fan-out on write (push):** when a user posts, write the post_id into every follower's feed cache. Fast reads, slow writes.
 - **Fan-out on read (pull):** at read time, fetch recent posts from everyone you follow and merge. Slow reads, cheap writes.
-- **Hybrid (the answer interviewers want):** push for normal users; for **celebrities** (millions of followers) don't fan out — merge their posts at read time.
+- **Hybrid (the usual answer):** push for normal users; for **celebrities** (millions of followers) don't fan out. Merge their posts at read time instead.
 - Ranking: candidate posts → ranking model (see [05 #4](05-case-studies.md#4-recommendation-system)).
 - IDs: time-sortable Snowflake IDs so feeds sort by ID.
 
@@ -69,16 +69,16 @@ Follow service → Social graph DB (followers / following)
 - *Celebrity posts → fan-out storm:* hybrid model above; rate-limit fan-out workers.
 - *Feed cache lost (Redis failure):* rebuild lazily from Posts DB via pull model; replicas for cache.
 - *User sees deleted post:* soft delete flag checked at hydration time.
-- Trade-off: freshness vs cost — fan-out lag of a few seconds is acceptable.
+- Trade-off: freshness vs cost. A fan-out lag of a few seconds is acceptable.
 
 ---
 
 ## 2. Video streaming platform
 > "Design a video platform like YouTube: upload and watch videos."
 
-**1. Requirements** — upload, transcode, watch on any device/network, search, view counts. Smooth playback, global, very read-heavy.
+**1. Requirements:** upload, transcode, watch on any device/network, search, view counts. Smooth playback, global, very read-heavy.
 
-**2. Estimates** — 500 hours of video uploaded per minute. 1B views/day ≈ 12k QPS for video starts. Storage huge: each video stored in many resolutions (~5× original). Bandwidth is the biggest cost → **CDN is essential**.
+**2. Estimates:** 500 hours of video uploaded per minute. 1B views/day ≈ 12k QPS for video starts. Storage huge: each video stored in many resolutions (~5× original). Bandwidth is the biggest cost → **you need a CDN**.
 
 **3. API**
 ```
@@ -100,24 +100,24 @@ Watch:   Client → API → metadata DB/cache → manifest URL
          Client player ──► CDN edge (segments) ──miss──► origin storage
 ```
 
-**5. Data model** — `videos(video_id, owner_id, title, status, duration, created_at)`, `video_files(video_id, resolution, codec, path)`, view counts in a separate counter store.
+**5. Data model:** `videos(video_id, owner_id, title, status, duration, created_at)`, `video_files(video_id, resolution, codec, path)`, view counts in a separate counter store.
 
 **6. Deep dives**
-- **Adaptive bitrate streaming (HLS/DASH):** video cut into 2–10 s segments at multiple bitrates; player switches quality based on bandwidth.
+- **Adaptive bitrate streaming (HLS/DASH):** video cut into 2-10 s segments at multiple bitrates; player switches quality based on bandwidth.
 - **Parallel transcoding:** split video into chunks → DAG of tasks → merge. Resumable uploads (chunked upload).
 - **View counts:** don't write to DB per view; count in stream (Kafka) → aggregate → batch update. Approximate is OK.
 - **Cost:** popular videos on CDN; long-tail videos served from fewer locations / cheaper storage tier.
 
-**7. What-ifs** — *Transcoding backlog:* autoscale workers, prioritize by channel popularity. *Viral video overloads origin:* CDN request coalescing, pre-warm. *Upload fails at 90%:* resumable chunked uploads. *Copyrighted content:* fingerprinting at upload.
+**7. What-ifs:** *Transcoding backlog:* autoscale workers, prioritize by channel popularity. *Viral video overloads origin:* CDN request coalescing, pre-warm. *Upload fails at 90%:* resumable chunked uploads. *Copyrighted content:* fingerprinting at upload.
 
 ---
 
 ## 3. Ride-hailing (geo-indexing)
 > "Design a ride-hailing app like Uber."
 
-**1. Requirements** — rider requests ride, match with nearby driver, live driver location, trip tracking, pricing, payment. Matching < few seconds, location updates every ~4 s.
+**1. Requirements:** rider requests ride, match with nearby driver, live driver location, trip tracking, pricing, payment. Matching < few seconds, location updates every ~4 s.
 
-**2. Estimates** — 5M active drivers sending location every 4 s → **~1.25M location writes/s** (this is the hard part). Ride requests: ~1k/s.
+**2. Estimates:** 5M active drivers sending location every 4 s → **~1.25M location writes/s** (this is the hard part). Ride requests: ~1k/s.
 
 **3. API**
 ```
@@ -136,26 +136,26 @@ Rider app → Ride service → Matching service: query geo index for nearby avai
 Pricing service (surge = demand/supply per area)   ETA service (routing graph + ML)
 ```
 
-**5. Data model** — `drivers(driver_id, status, vehicle)`, live location only in memory (`geo cell → set of driver_ids`), `trips(trip_id, rider_id, driver_id, state, route, fare)`.
+**5. Data model:** `drivers(driver_id, status, vehicle)`, live location only in memory (`geo cell → set of driver_ids`), `trips(trip_id, rider_id, driver_id, state, route, fare)`.
 
 **6. Deep dives**
-- **Geo-indexing:** split the map into cells — **geohash** (string prefix = area), **quadtree** (split dense areas more), or **H3 hexagons** (equal-size neighbours). Query: my cell + neighbour cells.
-- Location data is **ephemeral** — keep in memory, sharded by region/city; don't write every update to a DB.
+- **Geo-indexing:** split the map into cells: **geohash** (string prefix = area), **quadtree** (split dense areas more), or **H3 hexagons** (equal-size neighbours). Query: my cell + neighbour cells.
+- Location data is **ephemeral**. Keep it in memory, sharded by region/city; don't write every update to a DB.
 - **Matching consistency:** a driver must not get two rides → lock driver (atomic status change `AVAILABLE → OFFERED` with compare-and-set).
 - Trip as a **state machine**: requested → matched → arriving → in_progress → completed → paid.
 
-**7. What-ifs** — *Driver app loses network:* mark stale after N missed heartbeats. *Geo index node crashes:* rebuild in seconds from next location updates. *Hotspot (concert ends):* smaller cells in dense areas, surge pricing. *Two riders matched to same driver:* atomic CAS on driver status.
+**7. What-ifs:** *Driver app loses network:* mark stale after N missed heartbeats. *Geo index node crashes:* rebuild in seconds from next location updates. *Hotspot (concert ends):* smaller cells in dense areas, surge pricing. *Two riders matched to same driver:* atomic CAS on driver status.
 
 ---
 
 ## 4. Collaborative document editing
 > "Design a real-time collaborative editor like Google Docs."
 
-**1. Requirements** — many users edit the same doc at once, see each other's changes and cursors in < 100 ms, offline edits, version history, permissions.
+**1. Requirements:** many users edit the same doc at once, see each other's changes and cursors in < 100 ms, offline edits, version history, permissions.
 
-**2. Estimates** — most docs have 1–5 concurrent editors; few have 100+. Edit operations small (few bytes) but frequent.
+**2. Estimates:** most docs have 1-5 concurrent editors; few have 100+. Edit operations small (few bytes) but frequent.
 
-**3. API** — `GET /docs/{id}` (snapshot + version), WebSocket `/docs/{id}/session` for sending/receiving operations.
+**3. API:** `GET /docs/{id}` (snapshot + version), WebSocket `/docs/{id}/session` for sending/receiving operations.
 
 **4. High-level design**
 ```
@@ -166,7 +166,7 @@ Clients ──WebSocket──► Collaboration servers (one "owner" server per d
 Presence (cursors) via the same socket, not persisted.
 ```
 
-**5. Data model** — `documents(doc_id, owner, acl)`, `operations(doc_id, version, op, user_id, ts)`, `snapshots(doc_id, version, content)`.
+**5. Data model:** `documents(doc_id, owner, acl)`, `operations(doc_id, version, op, user_id, ts)`, `snapshots(doc_id, version, content)`.
 
 **6. Deep dives**
 - **The core problem:** two users edit the same place at the same time. Need all copies to end up identical.
@@ -174,43 +174,43 @@ Presence (cursors) via the same socket, not persisted.
 - **CRDT (Conflict-free Replicated Data Types):** each character has a unique ID and position; merges are automatic and order-independent. Works peer-to-peer and offline. More memory. Used by Figma-style/local-first apps (Yjs, Automerge).
 - Version history = snapshots + op log replay.
 
-**7. What-ifs** — *User offline for an hour:* queue ops locally, rebase/merge on reconnect (CRDT easier). *Owner server dies:* another server takes the doc, rebuilds from snapshot + log. *Huge doc slow to load:* snapshot + lazy loading.
+**7. What-ifs:** *User offline for an hour:* queue ops locally, rebase/merge on reconnect (CRDT easier). *Owner server dies:* another server takes the doc, rebuilds from snapshot + log. *Huge doc slow to load:* snapshot + lazy loading.
 
 ---
 
 ## 5. File sync and storage
 > "Design a file sync service like Dropbox / Google Drive."
 
-**1. Requirements** — upload/download, sync across devices, share, version history, works with large files and bad networks.
+**1. Requirements:** upload/download, sync across devices, share, version history, works with large files and bad networks.
 
-**2. Estimates** — 50M users × 10 GB = 500 PB. Most files rarely change.
+**2. Estimates:** 50M users × 10 GB = 500 PB. Most files rarely change.
 
-**3. API** — `POST /files/chunks/check {hashes}` → which chunks are missing; `PUT /chunks/{hash}`; `POST /files/commit {path, chunk_list, base_version}`; long-poll/WebSocket `/changes?cursor=`.
+**3. API:** `POST /files/chunks/check {hashes}` → which chunks are missing; `PUT /chunks/{hash}`; `POST /files/commit {path, chunk_list, base_version}`; long-poll/WebSocket `/changes?cursor=`.
 
 **4. High-level design**
 ```
-Client (watcher + chunker) ──► Metadata service ──► Metadata DB (files, versions, chunk lists) — strongly consistent
+Client (watcher + chunker) ──► Metadata service ──► Metadata DB (files, versions, chunk lists), strongly consistent
                           ──► Block service ──► Object storage (chunks addressed by hash)
 Notification service ──► other devices pull changes
 ```
 
-**5. Data model** — `files(file_id, owner, path, latest_version)`, `versions(file_id, version, chunk_hashes[], modified_by)`, `chunks(hash, size, location, ref_count)`.
+**5. Data model:** `files(file_id, owner, path, latest_version)`, `versions(file_id, version, chunk_hashes[], modified_by)`, `chunks(hash, size, location, ref_count)`.
 
 **6. Deep dives**
 - **Chunking (4 MB) + content hashing:** only upload changed chunks (delta sync), resumable, **deduplication** (same chunk stored once across users).
 - Metadata needs **strong consistency** (SQL); blocks need durability (object storage, replicated).
 - **Conflicts:** two devices edit offline → commit with `base_version`; if stale, keep both ("conflicted copy").
 
-**7. What-ifs** — *Huge file on mobile network:* chunked, resumable, pause on metered networks. *Ransomware encrypts files and syncs:* version history + bulk-restore. *Deleting a deduplicated chunk:* reference counting + delayed garbage collection.
+**7. What-ifs:** *Huge file on mobile network:* chunked, resumable, pause on metered networks. *Ransomware encrypts files and syncs:* version history + bulk-restore. *Deleting a deduplicated chunk:* reference counting + delayed garbage collection.
 
 ---
 
 ## 6. Payment system
 > "Design a payment system for an e-commerce site."
 
-**1. Requirements** — charge customers via card/wallet (external payment providers), refunds, pay out sellers, never lose or double-charge money, audit trail.
+**1. Requirements:** charge customers via card/wallet (external payment providers), refunds, pay out sellers, never lose or double-charge money, audit trail.
 
-**2. Estimates** — 1M orders/day ≈ 12 TPS. Throughput is small — **correctness is everything**.
+**2. Estimates:** 1M orders/day ≈ 12 TPS. Throughput is small. **Correctness is what matters.**
 
 **3. API**
 ```
@@ -230,28 +230,28 @@ Checkout → Payment service ──► Payments DB (state machine)  ──► Pa
 Nightly reconciliation job: our ledger vs provider settlement files → mismatches → alerts / manual review
 ```
 
-**5. Data model** — `payments(payment_id, order_id, idempotency_key UNIQUE, amount, currency, status, provider_ref)`, `ledger_entries(entry_id, txn_id, account_id, debit, credit, created_at)` — every transaction has entries whose debits = credits.
+**5. Data model:** `payments(payment_id, order_id, idempotency_key UNIQUE, amount, currency, status, provider_ref)`, `ledger_entries(entry_id, txn_id, account_id, debit, credit, created_at)`. Every transaction has entries whose debits = credits.
 
 **6. Deep dives**
 - **Idempotency:** client sends a unique key; server stores it with the result; a retry returns the stored result instead of charging again.
 - **State machine:** created → pending → succeeded / failed → refunded. Only valid transitions allowed.
 - **Double-entry ledger:** money moves between accounts (customer → platform → seller); append-only, never update. Easy auditing.
-- **Unknown outcome** (timeout from provider): mark *pending*, query provider status / wait for webhook — never blindly retry with a new key.
+- **Unknown outcome** (timeout from provider): mark *pending*, query provider status / wait for the webhook. Never blindly retry with a new key.
 - **Exactly-once effects** via idempotency + **transactional outbox** (write event in the same DB transaction).
-- Money as integers (cents) + currency, never floats. PCI: don't store card numbers — use provider tokens.
+- Money as integers (cents) + currency, never floats. PCI: don't store card numbers. Use provider tokens.
 
-**7. What-ifs** — *Provider timed out, did the charge happen?* → pending + reconcile. *Webhook arrives twice:* dedupe by event ID. *Ledger and provider disagree:* reconciliation flags it, human review. *Provider down:* failover to second provider for new payments.
+**7. What-ifs:** *Provider timed out, did the charge happen?* → pending + reconcile. *Webhook arrives twice:* dedupe by event ID. *Ledger and provider disagree:* reconciliation flags it, human review. *Provider down:* failover to second provider for new payments.
 
 ---
 
 ## 7. Notification system
 > "Design a system that sends push, SMS and email notifications."
 
-**1. Requirements** — many services send notifications; channels push/SMS/email/in-app; user preferences & opt-out; templates; scheduling; rate limits; no spam/duplicates.
+**1. Requirements:** many services send notifications; channels push/SMS/email/in-app; user preferences & opt-out; templates; scheduling; rate limits; no spam/duplicates.
 
-**2. Estimates** — 10M push + 1M SMS + 5M email per day; spikes during campaigns.
+**2. Estimates:** 10M push + 1M SMS + 5M email per day; spikes during campaigns.
 
-**3. API** — `POST /v1/notifications { user_id, template_id, params, channels, priority, dedupe_key }`.
+**3. API:** `POST /v1/notifications { user_id, template_id, params, channels, priority, dedupe_key }`.
 
 **4. High-level design**
 ```
@@ -261,18 +261,18 @@ Services → Notification API → validate, check preferences & rate limits, ren
         → Delivery status / retries / DLQ → status DB → analytics
 ```
 
-**6. Deep dives** — separate queues so marketing floods don't delay OTP codes; retries with backoff; dedupe by `dedupe_key`; user quiet hours & time zones; provider failover; tracking (delivered, opened).
+**6. Deep dives:** separate queues so marketing floods don't delay OTP codes; retries with backoff; dedupe by `dedupe_key`; user quiet hours & time zones; provider failover; tracking (delivered, opened).
 
-**7. What-ifs** — *Campaign of 50M emails slows OTPs:* priority queues. *Provider down:* failover provider. *User receives same notification 3×:* idempotent workers + dedupe key. *Device tokens expired:* remove on provider feedback.
+**7. What-ifs:** *Campaign of 50M emails slows OTPs:* priority queues. *Provider down:* failover provider. *User receives same notification 3×:* idempotent workers + dedupe key. *Device tokens expired:* remove on provider feedback.
 
 ---
 
 ## 8. Web crawler
 > "Design a crawler that downloads 1 billion pages per month."
 
-**1. Requirements** — crawl the web, respect robots.txt and politeness, avoid duplicates, refresh pages, store content for indexing.
+**1. Requirements:** crawl the web, respect robots.txt and politeness, avoid duplicates, refresh pages, store content for indexing.
 
-**2. Estimates** — 1B pages / month ≈ 400 pages/s; 500 KB/page → 500 TB/month.
+**2. Estimates:** 1B pages / month ≈ 400 pages/s; 500 KB/page → 500 TB/month.
 
 **4. High-level design**
 ```
@@ -282,18 +282,18 @@ Seed URLs → URL frontier (priority + per-host queues for politeness)
           → Parser → extract links → URL filter (seen? Bloom filter) → back to frontier
 ```
 
-**6. Deep dives** — **politeness:** one queue per host, delay between requests; **URL seen check** with Bloom filter + DB; **priority** by PageRank/freshness; **recrawl** frequency by change rate; distributed by hashing host → crawler node.
+**6. Deep dives:** **politeness:** one queue per host, delay between requests; **URL seen check** with Bloom filter + DB; **priority** by PageRank/freshness; **recrawl** frequency by change rate; distributed by hashing host → crawler node.
 
-**7. What-ifs** — *Crawler trap (infinite calendar URLs):* max depth, URL pattern limits. *Site blocks us:* slow down, respect robots. *Duplicate content on many URLs:* canonical URLs + SimHash.
+**7. What-ifs:** *Crawler trap (infinite calendar URLs):* max depth, URL pattern limits. *Site blocks us:* slow down, respect robots. *Duplicate content on many URLs:* canonical URLs + SimHash.
 
 ---
 
 ## 9. Search autocomplete (typeahead)
 > "Show top 5 suggestions as the user types."
 
-**1. Requirements** — suggestions in < 100 ms per keystroke, ranked by popularity (+ personalization), updated daily or near-real-time, filter offensive terms.
+**1. Requirements:** suggestions in < 100 ms per keystroke, ranked by popularity (+ personalization), updated daily or near-real-time, filter offensive terms.
 
-**2. Estimates** — 10M DAU × 20 searches × 6 keystrokes = 1.2B requests/day ≈ 14k QPS.
+**2. Estimates:** 10M DAU × 20 searches × 6 keystrokes = 1.2B requests/day ≈ 14k QPS.
 
 **4. High-level design**
 ```
@@ -301,16 +301,16 @@ Offline: search logs → aggregate counts (Spark, daily) → build Trie with top
 Online:  Client (debounce 100 ms, browser cache) → CDN/edge cache → Autocomplete service (trie in memory, sharded by prefix) 
 ```
 
-**6. Deep dives** — store **top-k at each trie node** (no traversal at query time); shard by first letters (watch for skew); real-time trending via stream counts merged with daily trie; personalization re-ranks a few results.
+**6. Deep dives:** store **top-k at each trie node** (no traversal at query time); shard by first letters (watch for skew); real-time trending via stream counts merged with daily trie; personalization re-ranks a few results.
 
-**7. What-ifs** — *Breaking news term missing:* streaming trending layer. *Offensive suggestion:* blocklist filter before serving. *Hot prefix "a" overloads shard:* cache common prefixes at edge.
+**7. What-ifs:** *Breaking news term missing:* streaming trending layer. *Offensive suggestion:* blocklist filter before serving. *Hot prefix "a" overloads shard:* cache common prefixes at edge.
 
 ---
 
 ## 10. Distributed key-value store
 > "Design a key-value store like DynamoDB/Cassandra."
 
-**1. Requirements** — `put(key, value)`, `get(key)`; huge scale; highly available; tunable consistency.
+**1. Requirements:** `put(key, value)`, `get(key)`; huge scale; highly available; tunable consistency.
 
 **4. Design (key ideas)**
 ```
@@ -322,9 +322,9 @@ Write path: commit log (WAL) → memtable (memory) → flush to SSTables on disk
 - **Quorum:** write to W, read from R; **W + R > N** → strong-ish consistency. Lower W/R → faster, more available.
 - **Conflicts:** last-write-wins (timestamps) or vector clocks (detect concurrent writes).
 - **Failure handling:** **hinted handoff** (another node holds writes for a dead node), **read repair**, **anti-entropy with Merkle trees**, gossip for membership.
-- Storage: **LSM tree** — fast writes; Bloom filters to skip SSTables on reads.
+- Storage: an **LSM tree** for fast writes; Bloom filters to skip SSTables on reads.
 
-**7. What-ifs** — *Node dies:* hinted handoff, then replace and stream data. *Network partition:* choose AP (accept writes, resolve later) or CP (reject) per CAP. *Hot key:* add caching / key splitting.
+**7. What-ifs:** *Node dies:* hinted handoff, then replace and stream data. *Network partition:* choose AP (accept writes, resolve later) or CP (reject) per CAP. *Hot key:* add caching / key splitting.
 
 ---
 
@@ -344,16 +344,16 @@ Controller (Raft/ZooKeeper) handles leader election and metadata
 - **Throughput:** sequential disk writes, batching, compression, zero-copy.
 - **Delivery semantics:** at-least-once by default (commit offset after processing) → idempotent consumers; exactly-once via idempotent producers + transactions.
 
-**What-ifs** — *Consumer lag grows:* add partitions + consumers, speed up processing, check for slow/poison messages (DLQ). *Broker dies:* follower in ISR becomes leader. *Hot partition:* better key, add salt.
+**What-ifs:** *Consumer lag grows:* add partitions + consumers, speed up processing, check for slow/poison messages (DLQ). *Broker dies:* follower in ISR becomes leader. *Hot partition:* better key, add salt.
 
 ---
 
 ## 12. Ticket booking (seat locking)
 > "Design a concert/movie ticket booking system."
 
-**1. Requirements** — browse events, pick seats, hold seats for ~10 min while paying, no double booking, survive huge spikes (big concert sale).
+**1. Requirements:** browse events, pick seats, hold seats for ~10 min while paying, no double booking, survive huge spikes (big concert sale).
 
-**2. Estimates** — normal: low QPS. Big sale: 1M users in the first minutes for 50k seats.
+**2. Estimates:** normal: low QPS. Big sale: 1M users in the first minutes for 50k seats.
 
 **4. High-level design**
 ```
@@ -368,7 +368,7 @@ Seats DB: seats(event_id, seat_id, status, booking_id, version)
 - **Waiting room** protects the system and is fair (FIFO).
 - Bots: CAPTCHA, purchase limits per account.
 
-**7. What-ifs** — *Payment succeeds after hold expired:* refund or re-check seat; extend hold during payment. *Redis down:* fall back to DB row locks (slower). *Spike 100× expected:* waiting room, static pages from CDN, autoscale.
+**7. What-ifs:** *Payment succeeds after hold expired:* refund or re-check seat; extend hold during payment. *Redis down:* fall back to DB row locks (slower). *Spike 100× expected:* waiting room, static pages from CDN, autoscale.
 
 ---
 
@@ -394,7 +394,7 @@ Agents on hosts → collectors (push) or scrapers (pull) → Kafka → ingesters
 Query service → dashboards;  Alert evaluator (rules every minute) → notification system
 Downsampling: raw 10 s for 7 days → 1 min for 30 days → 1 h for 1 year
 ```
-- **Deep dives:** **cardinality explosion** (labels like user_id create millions of series — limit them), retention & downsampling, alert deduplication and routing.
+- **Deep dives:** **cardinality explosion** (labels like user_id create millions of series, so limit them), retention & downsampling, alert deduplication and routing.
 - **What-ifs:** *Monitoring system down during an incident:* run it separately from what it monitors, multi-region. *Alert storm:* group alerts, dependency-aware alerting.
 
 ---
@@ -417,7 +417,7 @@ Scheduler (leader-elected or partitioned by job_id hash): poll jobs where next_r
 ## 16. Real-time leaderboard
 > "Top 100 players for a game with 50M players, updated in real time."
 
-- **Design:** Redis **sorted set** (`ZADD leaderboard score user`, `ZREVRANGE 0 99`, `ZREVRANK user`) — O(log n) updates. Persist scores in DB as source of truth.
+- **Design:** Redis **sorted set** (`ZADD leaderboard score user`, `ZREVRANGE 0 99`, `ZREVRANK user`) gives O(log n) updates. Persist scores in DB as source of truth.
 - **Scale:** shard by score range or by region; global top-k = merge top-k of each shard. Daily/weekly boards = separate keys with TTL.
 - **What-ifs:** *Redis lost:* rebuild from DB. *Cheating:* validate scores server-side. *Exact rank for millions:* approximate rank for low-ranked players (percentile buckets).
 
@@ -434,7 +434,7 @@ Scheduler (leader-elected or partitioned by job_id hash): poll jobs where next_r
 ---
 
 ## 18. Stock exchange / order matching
-> (Brief — asked mostly at fintech/trading firms.)
+> (Brief. Asked mostly at fintech and trading firms.)
 
 - **Core:** **order book** per symbol: buy orders sorted by price desc, sell orders by price asc, then by time (price-time priority). Matching engine is **single-threaded per symbol** for determinism and very low latency (microseconds), in memory.
 - **Durability:** every incoming order written to a sequenced, replicated log before matching; engine state can be rebuilt by replaying the log; hot standby replicas consume the same log.

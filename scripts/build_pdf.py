@@ -17,7 +17,7 @@ from pygments.formatters import HtmlFormatter
 ROOT = Path(__file__).resolve().parent.parent
 OUT_HTML = ROOT / "build" / "ai-ml-interview-prep.html"
 OUT_PDF = ROOT / "AI-ML-Interview-Prep.pdf"
-TITLE = "AI / ML / DL / NLP Interview Prep — Zero to Hero"
+TITLE = "AI / ML / DL / NLP Interview Prep: Zero to Hero"
 
 
 def slugify(value, separator="-"):

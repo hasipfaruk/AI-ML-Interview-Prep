@@ -1,4 +1,4 @@
-# 10 — Computer Vision
+# 10. Computer Vision
 
 ### Contents
 1. [Core tasks](#1-core-tasks)
@@ -34,17 +34,17 @@
 
 **Q: IoU?** Intersection area / union area of predicted vs ground-truth box.
 
-**Q: U-Net?** Encoder-decoder with skip connections that keep fine spatial detail — standard for segmentation (especially medical).
+**Q: U-Net?** Encoder-decoder with skip connections that keep fine spatial detail. Standard for segmentation (especially medical).
 
 **Q: Vision Transformer (ViT)?** Split image into patches, embed them as tokens, apply Transformer. Needs lots of data or pretraining; less built-in inductive bias than CNNs.
 
 **Q: CLIP?** Image encoder + text encoder trained contrastively on image-text pairs → shared embedding space → zero-shot classification and image search with text.
 
-**Q: Transfer learning in CV?** Start from ImageNet/foundation-model weights; replace head; fine-tune. Huge gains with small data.
+**Q: Transfer learning in CV?** Start from ImageNet/foundation-model weights; replace head; fine-tune. Big gains when you have little data.
 
-**Q: Focal loss?** Down-weights easy examples, focuses on hard ones — fixes foreground/background imbalance in detection.
+**Q: Focal loss?** Down-weights easy examples, focuses on hard ones. Fixes foreground/background imbalance in detection.
 
-**Q: Self-supervised learning in vision?** SimCLR/MoCo (contrastive), MAE (masked patches), DINO — learn features without labels.
+**Q: Self-supervised learning in vision?** SimCLR/MoCo (contrastive), MAE (masked patches), DINO. They learn features without labels.
 
 ## 3. Metrics
 - Classification: accuracy, precision/recall/F1, top-5 accuracy, confusion matrix.

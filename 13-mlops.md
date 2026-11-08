@@ -1,4 +1,4 @@
-# 13 — MLOps & Production ML (Q&A)
+# 13. MLOps & Production ML (Q&A)
 
 Complements [02-ml-and-llm-systems.md](02-ml-and-llm-systems.md). Asked heavily in ML Engineer / MLOps / AI Engineer interviews.
 
@@ -7,13 +7,13 @@ Complements [02-ml-and-llm-systems.md](02-ml-and-llm-systems.md). Asked heavily 
 **Q: What is MLOps?** Practices to reliably build, deploy, monitor and improve ML models in production: CI/CD for code **and** data **and** models, reproducibility, automation, monitoring.
 
 **Q: How is ML CI/CD different from software CI/CD?**
-Software: test code → deploy. ML adds: data validation, training pipeline, model evaluation gates (must beat current model), model registry, continuous training (CT), and monitoring of data/model quality — not just uptime.
+Software: test code → deploy. ML adds: data validation, training pipeline, model evaluation gates (must beat current model), model registry, continuous training (CT), and monitoring of data/model quality as well as uptime.
 
 **Q: MLOps maturity levels?** Level 0: manual notebooks. Level 1: automated training pipeline + continuous training. Level 2: full CI/CD of pipelines with automated testing, deployment and monitoring.
 
 **Q: What should you version?** Code (git), data (DVC/lakeFS/Delta), features, model artifacts (registry), hyperparameters/config, environment (Docker image, requirements lock), prompts (for LLMs), eval datasets.
 
-**Q: Tools you should know by name?**
+**Q: Which tools should you know by name?**
 | Need | Tools |
 |---|---|
 | Orchestration | Airflow, Kubeflow Pipelines, Prefect, Dagster, SageMaker/Vertex Pipelines |
@@ -48,7 +48,7 @@ Software: test code → deploy. ML adds: data validation, training pipeline, mod
 
 **Q: Responsible AI in production?** Fairness checks by slice, explainability, model cards, data privacy (PII handling, retention), audit trails, human oversight for high-stakes decisions.
 
-**Q: LLMOps — what's different?** Prompt versioning, eval suites with LLM judges, token cost monitoring, tracing multi-step chains/agents, guardrails, provider fallback, managing model version changes from vendors, RAG index pipelines.
+**Q: What's different in LLMOps?** Prompt versioning, eval suites with LLM judges, token cost monitoring, tracing multi-step chains/agents, guardrails, provider fallback, managing model version changes from vendors, RAG index pipelines.
 
 ## What-if scenarios (MLOps)
 - **Training pipeline fails at 3 AM** → alerting, retries for transient errors, idempotent steps, checkpointing; keep serving the previous model (never block serving on training).

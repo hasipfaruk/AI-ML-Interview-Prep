@@ -1,28 +1,28 @@
-# 01 — System Design Fundamentals (Zero → Solid)
+# 01. System Design Fundamentals (Zero → Solid)
 
 Even ML/AI interviews expect these basics. Every AI system is still a web system underneath.
 
 ### Contents
-1. [The big picture](#part-1--the-big-picture)
-2. [Networking & APIs](#part-2--networking--apis)
-3. [Scaling: load balancers, caching, CDN](#part-3--scaling-load-balancers-caching-cdn)
-4. [Databases](#part-4--databases)
-5. [Async processing: queues & streams](#part-5--async-processing-queues--streams)
-6. [Distributed systems concepts](#part-6--distributed-systems-concepts)
-7. [Reliability, monitoring, security](#part-7--reliability-monitoring-security)
-8. [Back-of-the-envelope estimation](#part-8--back-of-the-envelope-estimation)
+1. [The big picture](#part-1-the-big-picture)
+2. [Networking & APIs](#part-2-networking--apis)
+3. [Scaling: load balancers, caching, CDN](#part-3-scaling-load-balancers-caching-cdn)
+4. [Databases](#part-4-databases)
+5. [Async processing: queues & streams](#part-5-async-processing-queues--streams)
+6. [Distributed systems concepts](#part-6-distributed-systems-concepts)
+7. [Reliability, monitoring, security](#part-7-reliability-monitoring-security)
+8. [Back-of-the-envelope estimation](#part-8-back-of-the-envelope-estimation)
 
 ---
 
-## Part 1 — The big picture
+## Part 1: The big picture
 
 **System design = deciding which components you need and how they talk, so the system meets its requirements at scale.**
 
 Two kinds of requirements:
-- **Functional** — what it does ("users can upload documents and ask questions").
-- **Non-functional** — how well: scale, latency, availability, consistency, cost, security.
+- **Functional**: what it does ("users can upload documents and ask questions").
+- **Non-functional**: how well it works (scale, latency, availability, consistency, cost, security).
 
-### The growth story (memorize this — it's the skeleton of every design)
+### The growth story (memorize this: it's the skeleton of every design)
 ```
 Stage 1:  User → [Single server: app + DB]                      (works for ~100s of users)
 Stage 2:  User → [App server] → [Database]                      (separate concerns)
@@ -45,7 +45,7 @@ Stage 8:  ... + multiple regions, monitoring, autoscaling       (global + reliab
 
 ---
 
-## Part 2 — Networking & APIs
+## Part 2: Networking & APIs
 
 **What happens when you type a URL:** DNS resolves name → IP → TCP connection (+ TLS handshake for HTTPS) → HTTP request → load balancer → server → response.
 
@@ -75,7 +75,7 @@ Stage 8:  ... + multiple regions, monitoring, autoscaling       (global + reliab
 
 ---
 
-## Part 3 — Scaling: load balancers, caching, CDN
+## Part 3: Scaling: load balancers, caching, CDN
 
 ### Vertical vs horizontal scaling
 - **Vertical** = bigger machine. Simple, but has a ceiling and is a single point of failure.
@@ -83,7 +83,7 @@ Stage 8:  ... + multiple regions, monitoring, autoscaling       (global + reliab
 
 ### Load balancer
 Spreads requests across servers, removes unhealthy ones (health checks).
-- **L4** (TCP level, fast) vs **L7** (HTTP level — can route by URL/header, e.g., `/api/llm` → GPU pool).
+- **L4** (TCP level, fast) vs **L7** (HTTP level, can route by URL/header, e.g., `/api/llm` → GPU pool).
 - Algorithms: round-robin, least connections, weighted, consistent hashing (sticky by key).
 - Related: **reverse proxy** (Nginx), **API gateway** (auth, rate limiting, routing, logging in one place).
 
@@ -115,7 +115,7 @@ Copies static files (images, JS, videos, model files) to servers worldwide. User
 
 ---
 
-## Part 4 — Databases
+## Part 4: Databases
 
 ### SQL vs NoSQL
 | | SQL (Postgres, MySQL) | NoSQL |
@@ -127,18 +127,18 @@ Copies static files (images, JS, videos, model files) to servers worldwide. User
 **Interview default:** "I'll start with Postgres for metadata because we need consistency and joins; I'd move high-volume append-only data like chat messages to Cassandra/DynamoDB."
 
 **Specialized stores you should name:**
-- **Object storage** (S3/GCS): files, images, model weights, datasets — cheap, huge.
+- **Object storage** (S3/GCS): files, images, model weights, datasets. Cheap and huge.
 - **Vector DB** (Pinecone, Weaviate, Milvus, Qdrant, pgvector): embeddings + similarity search.
 - **Search engine** (Elasticsearch/OpenSearch): full-text keyword search, inverted index, BM25.
 - **Data warehouse / lakehouse** (BigQuery, Snowflake, Databricks): analytics, training data.
 - **Time-series DB**: metrics. **Feature store** (Feast, Tecton): ML features.
 
 ### ACID vs BASE
-- **ACID** — Atomic, Consistent, Isolated, Durable (bank transfers).
-- **BASE** — Basically Available, Soft state, Eventually consistent (likes counter).
+- **ACID**: Atomic, Consistent, Isolated, Durable (bank transfers).
+- **BASE**: Basically Available, Soft state, Eventually consistent (likes counter).
 
 ### Indexes
-Like a book index — makes reads fast, writes slightly slower. B-tree (most SQL), LSM-tree (write-heavy: Cassandra, RocksDB). For vectors: **HNSW** (graph, fast, memory-heavy), **IVF** (clusters), **PQ** (compression).
+Like a book index. It makes reads fast, writes slightly slower. B-tree (most SQL), LSM-tree (write-heavy: Cassandra, RocksDB). For vectors: **HNSW** (graph, fast, memory-heavy), **IVF** (clusters), **PQ** (compression).
 
 ### Replication
 Copies of data on multiple machines.
@@ -148,9 +148,9 @@ Copies of data on multiple machines.
 
 ### Sharding (partitioning)
 Split data across machines.
-- **By hash of key** (even spread) — `shard = hash(user_id) % N`.
+- **By hash of key** (even spread): `shard = hash(user_id) % N`.
 - **By range** (good for range queries, risk of hot spots).
-- **By tenant** (common in B2B/RAG — isolation per customer).
+- **By tenant** (common in B2B/RAG, gives isolation per customer).
 - **Consistent hashing:** keys and servers on a ring; adding a server only moves ~1/N keys. (Used in caches, Cassandra, DynamoDB.)
 - Problems: hot shards, cross-shard joins, resharding.
 
@@ -159,7 +159,7 @@ Duplicate data to avoid joins for fast reads (e.g., store author name inside pos
 
 ---
 
-## Part 5 — Async processing: queues & streams
+## Part 5: Async processing: queues & streams
 
 **Why:** don't make users wait for slow work (embedding a 500-page PDF, sending emails, training jobs).
 ```
@@ -172,19 +172,19 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 
 - **Delivery guarantees:** at-most-once, **at-least-once (default)**, exactly-once (hard). With at-least-once, make consumers **idempotent**.
 - **Dead-letter queue (DLQ):** messages that fail repeatedly go aside for inspection.
-- **Backpressure:** when consumers can't keep up — queue grows; autoscale workers or slow producers.
+- **Backpressure:** when consumers can't keep up, the queue grows; autoscale workers or slow producers.
 - **Batch vs stream processing:** Spark (batch, hourly/daily) vs Flink/Kafka Streams (real-time). ML: batch features vs real-time features.
 
 ### Architecture styles
-- **Monolith** — one deployable. Start here. Simple.
-- **Microservices** — separate services per domain; independent scaling & deploys; cost: network calls, distributed debugging.
-- **Event-driven** — services react to events on Kafka.
-- **CQRS** — separate write model and read model.
-- **Saga** — distributed transaction as a sequence of local steps with compensating actions.
+- **Monolith**: one deployable. Start here. Simple.
+- **Microservices**: separate services per domain; independent scaling & deploys; cost: network calls, distributed debugging.
+- **Event-driven**: services react to events on Kafka.
+- **CQRS**: separate write model and read model.
+- **Saga**: distributed transaction as a sequence of local steps with compensating actions.
 
 ---
 
-## Part 6 — Distributed systems concepts
+## Part 6: Distributed systems concepts
 
 | Concept | Plain explanation |
 |---------|------------------|
@@ -194,7 +194,7 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 | **Strong consistency** | Every read sees latest write. Slower. |
 | **Consensus (Raft/Paxos)** | Nodes agree on a value/leader despite failures (etcd, ZooKeeper). |
 | **Leader election** | Pick one node to coordinate (e.g., one scheduler for training jobs). |
-| **Idempotency** | Doing an operation twice = same result as once. Essential with retries. |
+| **Idempotency** | Doing an operation twice = same result as once. You need this whenever you retry. |
 | **Retries + exponential backoff + jitter** | Retry after 1s, 2s, 4s (+ random) to avoid overwhelming a recovering service. |
 | **Circuit breaker** | Stop calling a failing service for a while; return fallback. |
 | **Bulkhead** | Isolate resources so one failure doesn't sink everything (separate pools). |
@@ -202,11 +202,11 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 | **Unique IDs** | UUID (random), Snowflake (time + machine + sequence, sortable). |
 | **Bloom filter** | Tiny structure answering "definitely not in set / maybe in set" (crawler seen-URLs). |
 | **Heartbeats / gossip** | Detect dead nodes / spread cluster state. |
-| **2PC** | Two-phase commit across DBs — consistent but slow and blocking. |
+| **2PC** | Two-phase commit across DBs. Consistent, but slow and blocking. |
 
 ---
 
-## Part 7 — Reliability, monitoring, security
+## Part 7: Reliability, monitoring, security
 
 ### Availability numbers
 | Availability | Downtime/year |
@@ -221,14 +221,14 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 - **SLI / SLO / SLA:** indicator (p95 latency), objective (p95 < 2s for 99% of days), agreement (contract with penalties).
 
 ### Observability (3 pillars)
-- **Metrics** — numbers over time (QPS, latency p50/p95/p99, error rate, GPU utilization, token usage).
-- **Logs** — events with details.
-- **Traces** — one request followed across all services (OpenTelemetry). **For LLM apps: trace every step — retrieval, prompt, model call, tokens, cost.**
+- **Metrics**: numbers over time (QPS, latency p50/p95/p99, error rate, GPU utilization, token usage).
+- **Logs**: events with details.
+- **Traces**: one request followed across all services (OpenTelemetry). **For LLM apps, trace every step: retrieval, prompt, model call, tokens, cost.**
 
 ### Deployments
 - **Blue-green:** two environments, switch traffic.
-- **Canary:** send 1–5% of traffic to new version, watch metrics, then expand.
-- **Shadow:** new version receives copy of traffic, its outputs are not shown to users (great for ML models).
+- **Canary:** send 1-5% of traffic to new version, watch metrics, then expand.
+- **Shadow:** new version receives copy of traffic, its outputs are not shown to users (very useful for ML models).
 - **Feature flags:** turn features on/off without deploy.
 
 ### Security basics
@@ -239,7 +239,7 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 
 ---
 
-## Part 8 — Back-of-the-envelope estimation
+## Part 8: Back-of-the-envelope estimation
 
 ### Numbers to memorize
 | | |
@@ -247,28 +247,28 @@ API → [Queue] → Workers (scale independently) → result in DB → notify us
 | 1 day | ≈ 86,400 s ≈ **10⁵ s** |
 | 1M requests/day | ≈ **12 QPS** |
 | 100M requests/day | ≈ 1,200 QPS |
-| Peak traffic | ≈ 2–3× average |
+| Peak traffic | ≈ 2-3× average |
 | Memory read | ~100 ns |
 | SSD read | ~100 µs |
 | Same-datacenter network round trip | ~0.5 ms |
 | Cross-continent round trip | ~150 ms |
 | Redis get | ~1 ms |
-| DB indexed query | ~5–50 ms |
-| LLM first token | ~200–800 ms |
-| LLM generation | ~30–100 tokens/s per stream |
+| DB indexed query | ~5-50 ms |
+| LLM first token | ~200-800 ms |
+| LLM generation | ~30-100 tokens/s per stream |
 | 1 token | ≈ 0.75 English words ≈ 4 chars |
 | Embedding (float32, 1536 dims) | 1536 × 4 B ≈ **6 KB** |
 | 7B model in FP16 | ≈ 14 GB GPU memory (2 bytes/param) |
 
 ### Formula
 ```
-QPS          = daily_requests / 86,400          (× 2–3 for peak)
+QPS          = daily_requests / 86,400          (× 2-3 for peak)
 Storage      = items × size × retention
 Bandwidth    = QPS × response_size
 Servers      = peak QPS / QPS_per_server
 ```
 
-### Worked example — RAG for a company with 10,000 employees
+### Worked example: RAG for a company with 10,000 employees
 - Each asks 10 questions/day → 100k/day → **~1.2 QPS avg, ~5 QPS peak**. (Small! Don't over-engineer.)
 - Corpus: 1M documents × 10 chunks = **10M chunks** × 6 KB = **60 GB vectors** (+ HNSW overhead ~1.5×) → fits on one vector DB node with replicas; or compress with PQ.
 - LLM tokens: 100k × (3k input + 300 output) = 330M tokens/day → cost estimate from price per million tokens.

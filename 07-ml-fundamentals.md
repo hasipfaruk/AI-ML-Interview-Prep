@@ -1,6 +1,6 @@
-# 07 — Machine Learning Fundamentals (Theory Round)
+# 07. Machine Learning Fundamentals (Theory Round)
 
-Format: **Q → short answer you can say in 30–60 seconds.** Then "what if" scenarios at the end.
+Format: **Q → short answer you can say in 30-60 seconds.** Then "what if" scenarios at the end.
 Practice: cover the answer, say it out loud, compare.
 
 ### Contents
@@ -19,7 +19,7 @@ Practice: cover the answer, say it out loud, compare.
 ## 1. Core concepts
 
 **Q: Supervised vs unsupervised vs self-supervised vs reinforcement learning?**
-Supervised: learn from labeled (x, y). Unsupervised: find structure without labels (clustering, dimensionality reduction). Self-supervised: create labels from the data itself (predict next token, masked word) — how LLMs are pretrained. RL: an agent learns by trial and error from rewards.
+Supervised: learn from labeled (x, y). Unsupervised: find structure without labels (clustering, dimensionality reduction). Self-supervised: create labels from the data itself (predict next token, masked word). This is how LLMs are pretrained. RL: an agent learns by trial and error from rewards.
 
 **Q: Classification vs regression?** Predict a category vs a continuous number.
 
@@ -37,7 +37,7 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 
 **Q: Curse of dimensionality?** In high dimensions data becomes sparse and distances become similar, so distance-based methods (kNN) degrade and you need far more data.
 
-**Q: No Free Lunch theorem?** No single algorithm is best for all problems — choose by data and constraints.
+**Q: No Free Lunch theorem?** No single algorithm is best for all problems. Choose based on your data and constraints.
 
 ## 2. Bias, variance, regularization
 
@@ -64,7 +64,7 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 
 **Q: What is multicollinearity and why does it matter?** Features highly correlated → unstable, uninterpretable coefficients. Detect with VIF; fix with removal, PCA, or Ridge.
 
-**Q: Logistic regression — how does it work?** Linear score → sigmoid → probability. Trained by minimizing **log loss (binary cross-entropy)**, which is maximum likelihood. Decision boundary is linear.
+**Q: How does logistic regression work?** Linear score → sigmoid → probability. Trained by minimizing **log loss (binary cross-entropy)**, which is maximum likelihood. Decision boundary is linear.
 
 **Q: Why not MSE for logistic regression?** With sigmoid, MSE is non-convex and gives weak gradients; log loss is convex and penalizes confident wrong predictions strongly.
 
@@ -72,7 +72,7 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 
 ## 4. Trees & ensembles
 
-**Q: How does a decision tree split?** Choose the feature/threshold that maximizes impurity reduction — Gini or entropy (information gain) for classification, variance/MSE for regression.
+**Q: How does a decision tree split?** Choose the feature/threshold that maximizes impurity reduction: Gini or entropy (information gain) for classification, variance/MSE for regression.
 
 **Q: Bagging vs boosting?**
 - **Bagging** (Random Forest): train many models in parallel on bootstrap samples, average them → **reduces variance**.
@@ -82,7 +82,7 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 
 **Q: Why is XGBoost/LightGBM so popular for tabular data?** Strong accuracy, handles missing values, regularization, fast (histogram-based splits), little preprocessing (no scaling needed). Usually beats deep learning on tabular data.
 
-**Q: Feature importance in trees — caveats?** Impurity-based importance is biased toward high-cardinality features. Use permutation importance or SHAP.
+**Q: Any caveats with feature importance in trees?** Impurity-based importance is biased toward high-cardinality features. Use permutation importance or SHAP.
 
 **Q: Stacking?** Train a meta-model on predictions of several base models (use out-of-fold predictions to avoid leakage).
 
@@ -111,12 +111,12 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 ## 7. Evaluation & metrics
 
 **Q: Confusion matrix terms?** TP, FP, TN, FN.
-- **Precision** = TP / (TP+FP) — "of what I flagged, how much was right?" (care when false alarms are costly: spam filter).
-- **Recall** = TP / (TP+FN) — "of all positives, how many did I catch?" (care when misses are costly: cancer, fraud).
+- **Precision** = TP / (TP+FP). "Of what I flagged, how much was right?" Care about it when false alarms are costly (spam filter).
+- **Recall** = TP / (TP+FN). "Of all positives, how many did I catch?" Care about it when misses are costly (cancer, fraud).
 - **F1** = harmonic mean of precision and recall.
 - **Accuracy** misleading on imbalanced data.
 
-**Q: ROC-AUC vs PR-AUC?** ROC plots TPR vs FPR across thresholds; AUC = probability a random positive ranks above a random negative. On heavy imbalance, ROC looks overly good — **PR-AUC** is more informative.
+**Q: ROC-AUC vs PR-AUC?** ROC plots TPR vs FPR across thresholds; AUC = probability a random positive ranks above a random negative. On heavy imbalance, ROC looks better than it really is, so **PR-AUC** tells you more.
 
 **Q: How to choose a threshold?** Based on business cost: minimize cost = FP·cost_FP + FN·cost_FN, or fix one constraint ("recall ≥ 95%") and maximize the other.
 
@@ -132,11 +132,11 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 
 **Q: How do you handle missing values?** First ask *why* missing (random or meaningful?). Options: drop, impute (mean/median/mode, model-based, KNN), add "is_missing" indicator, use models that handle NaN (XGBoost).
 
-**Q: How to handle categorical features?** One-hot (low cardinality), ordinal (ordered), target encoding (high cardinality — use out-of-fold to avoid leakage), hashing, learned embeddings.
+**Q: How to handle categorical features?** One-hot (low cardinality), ordinal (ordered), target encoding (high cardinality; use out-of-fold encoding to avoid leakage), hashing, learned embeddings.
 
 **Q: When do you need feature scaling?** Distance/gradient-based models: kNN, SVM, k-means, PCA, linear/logistic regression with regularization, neural nets. Not needed for trees. Fit the scaler on **train only**.
 
-**Q: How to handle imbalanced data?** Use proper metrics (PR-AUC, recall@precision); class weights; resampling (undersample majority, oversample minority, SMOTE — only on training data); threshold tuning; anomaly detection framing; collect more minority data.
+**Q: How to handle imbalanced data?** Use proper metrics (PR-AUC, recall@precision); class weights; resampling (undersample majority, oversample minority, SMOTE, applied only to training data); threshold tuning; anomaly detection framing; collect more minority data.
 
 **Q: What is data leakage? Examples?** Information in training that wouldn't be available at prediction time. Examples: scaling on full dataset before split; target encoding without folds; future data in time series; duplicate rows across train/test; a feature created after the outcome (e.g., "account_closed" predicting churn).
 
@@ -150,10 +150,10 @@ Supervised: learn from labeled (x, y). Unsupervised: find structure without labe
 Overfitting. Check leakage/split first (duplicates? distribution difference between train and val?). Then: regularization, simpler model, more data/augmentation, early stopping, cross-validation, feature selection. Plot learning curves: if val improves with more data → collect data.
 
 ### Both training and validation accuracy are low.
-Underfitting or bad data. Check labels quality, features informativeness, bugs (labels shuffled? wrong target column?). Try a more complex model, better features, less regularization. Compare to a simple baseline (predict majority class) — if you can't beat it, the problem is data, not model.
+Underfitting or bad data. Check labels quality, features informativeness, bugs (labels shuffled? wrong target column?). Try a more complex model, better features, less regularization. Compare to a simple baseline (predict majority class). If you can't beat it, the problem is the data, not the model.
 
 ### Validation score is suspiciously high (99%).
-Suspect **leakage** first: target-derived features, duplicates across splits, future info, ID columns correlated with target. Check top feature importances — a single dominating feature is a red flag.
+Suspect **leakage** first: target-derived features, duplicates across splits, future info, ID columns correlated with target. Check the top feature importances. If one feature dominates everything, that's a red flag.
 
 ### Model performs well on validation but poorly on test.
 Overfit to validation through heavy tuning, or val/test come from different distributions. Use cross-validation, a fresh holdout, check distributions.

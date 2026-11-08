@@ -1,4 +1,4 @@
-# 29 — Senior, Staff & Leadership Rounds (AI/ML)
+# 29. Senior, Staff & Leadership Rounds (AI/ML)
 
 For senior engineer, staff/principal engineer, tech lead and engineering manager roles in AI/ML.
 At this level, interviewers care less about *whether* you can build a model and more about **judgment**: what to build, what not to build, how to reduce risk, and how to get people aligned.
@@ -40,9 +40,9 @@ Basic behavioral prep (STAR, project deep dive) is in [15-behavioral-and-project
 **Q: How do you create a technical strategy for an AI/ML area?**
 1. **Understand the goal:** company objectives, user pain points, constraints (data, people, budget, regulation).
 2. **Assess today:** current systems, data quality, tooling, skills, tech debt.
-3. **Define where to be in 12–24 months:** a few clear bets (e.g., "shared feature store", "LLM gateway for all teams", "evaluation platform").
+3. **Define where to be in 12-24 months:** a few clear bets (e.g., "shared feature store", "LLM gateway for all teams", "evaluation platform").
 4. **Path:** phased milestones, each delivering value on its own (no "big bang in 18 months").
-5. **Write it down** (1–3 page doc), get feedback early, revise, communicate widely.
+5. **Write it down** (1-3 page doc), get feedback early, revise, communicate widely.
 6. **Measure:** metrics that show progress (time to deploy a model, % models monitored, cost per prediction).
 
 **Q: What makes a good roadmap?** Outcome-based (problems solved), not a list of features; has explicit priorities and non-goals; reviewed regularly; balances new features, reliability, and tech debt (e.g., 70/20/10).
@@ -60,13 +60,13 @@ Basic behavioral prep (STAR, project deep dive) is in [15-behavioral-and-project
 | Team skills | Can we operate it at 3 AM? |
 | Exit plan | Can we switch later? Use abstraction layers (e.g., an LLM gateway). |
 
-**Model answer pattern:** *"I'd buy (or use managed) for undifferentiated infrastructure and build where it's our core advantage — with an abstraction layer so we can switch later. Then I'd revisit when the scale or cost changes."*
+**Model answer pattern:** *"I'd buy (or use managed) for undifferentiated infrastructure and build where it's our core advantage, with an abstraction layer so we can switch later. Then I'd revisit when the scale or cost changes."*
 
 ## 4. Managing ML project risk and uncertainty
 ML projects are uncertain: you don't know if the data supports the goal until you try.
 
 **Techniques:**
-- **Feasibility spike first (1–3 weeks):** baseline + quick data analysis + rough model → go / no-go decision with stakeholders.
+- **Feasibility spike first (1-3 weeks):** baseline + quick data analysis + rough model → go / no-go decision with stakeholders.
 - **Define success and "kill criteria" upfront:** "If we can't reach 80% precision at 50% recall by week 6, we stop or change scope."
 - **Start with the simplest thing:** rules/heuristics, then classic ML, then deep learning/LLMs.
 - **Ship thin end-to-end slice early:** a simple model in production with monitoring beats a perfect model in a notebook.
@@ -75,21 +75,21 @@ ML projects are uncertain: you don't know if the data supports the goal until yo
 - **Communicate uncertainty honestly:** ranges and confidence, not single dates.
 
 ## 5. Estimating ML projects
-- Break into phases: **data (access, cleaning, labels)** → baseline → iteration → productionization → monitoring → launch. Data work is usually **50%+ of the time** — say this.
+- Break into phases: **data (access, cleaning, labels)** → baseline → iteration → productionization → monitoring → launch. Data work is usually **50%+ of the time**. Say this out loud.
 - Estimate phases separately; give **ranges** (best/likely/worst); re-estimate at milestones.
 - Time-box research phases instead of promising results.
 - Include non-modeling work: reviews (security, legal, privacy), integration, A/B test duration, documentation, on-call.
 
 ## 6. Technical debt in ML systems
 Common ML-specific debt (from "Hidden Technical Debt in ML Systems" ideas):
-- **Glue code & pipeline jungles** — ad-hoc scripts connecting everything.
-- **Entanglement (CACE):** "Changing Anything Changes Everything" — one feature change shifts the whole model.
+- **Glue code & pipeline jungles:** ad-hoc scripts connecting everything.
+- **Entanglement (CACE):** "Changing Anything Changes Everything". One feature change shifts the whole model.
 - **Undeclared consumers:** other teams silently use your model's outputs.
 - **Data dependencies** stronger than code dependencies, with no contracts.
 - **Dead experimental code paths** and unused features.
-- **Feedback loops** — model affects its own training data.
-- **Config debt** — thousands of untracked settings, prompts in random places.
-- **No monitoring / no evals** — the most dangerous debt.
+- **Feedback loops:** the model affects its own training data.
+- **Config debt:** thousands of untracked settings, prompts in random places.
+- **No monitoring / no evals:** the most dangerous debt.
 
 **How to handle debt as a leader:** make it visible (debt register with cost/risk), tie fixes to business impact ("each deploy takes 2 days → 1 hour saves X"), reserve capacity each quarter, fix debt while building related features, set standards (paved road) to stop new debt.
 
@@ -124,7 +124,7 @@ Common ML-specific debt (from "Hidden Technical Debt in ML Systems" ideas):
 
 ## 10. Incidents & postmortems
 **During an incident (as leader):** declare it, assign roles (incident commander, communications, investigators), **mitigate first** (rollback, disable feature, fallback), communicate regularly to stakeholders, keep a timeline.
-**After:** **blameless postmortem** — what happened, impact, timeline, root causes (often several), what went well, action items with owners and dates, and follow-up until done. Focus on systems and processes, not individuals.
+**After:** **blameless postmortem** covering what happened, impact, timeline, root causes (often several), what went well, action items with owners and dates, and follow-up until done. Focus on systems and processes, not individuals.
 AI-specific incidents: harmful/incorrect outputs at scale, data leakage between users, model drift causing business loss, runaway costs.
 
 ---
@@ -150,7 +150,7 @@ Start with use cases with clear value and low risk; create shared foundations (e
 Show respectful disagreement with data, listening to their constraints, finding a middle ground or disagreeing and committing, and the result. Avoid stories where you were "right and they were dumb".
 
 **7. How do you handle a project that is failing?**
-Detect early via milestones and metrics; be honest with stakeholders quickly; diagnose (wrong problem, bad data, unrealistic scope, team issues); options: rescope, pivot, add help, or stop. Stopping a project early is a success if it saves resources — say this.
+Detect early via milestones and metrics; be honest with stakeholders quickly; diagnose (wrong problem, bad data, unrealistic scope, team issues); options: rescope, pivot, add help, or stop. Stopping a project early is a success if it saves resources. Say this.
 
 **8. How do you measure the success of an ML platform team?**
 Adoption (teams/models using it), time from idea to production, number of incidents, % models with monitoring and evals, cost per model/prediction, internal user satisfaction.
@@ -174,7 +174,7 @@ Agree on decision criteria first (cost, risk, time, reversibility); time-boxed p
 Run it on *our* data with *our* eval set, check latency/cost at our scale, security & data handling (training on our data? retention? region?), SLAs, lock-in and exit plan, references. See [05 #3](05-case-studies.md#3-llm-gateway--internal-llm-platform) for abstraction.
 
 **15. What would you do in your first 90 days as ML tech lead?**
-30 days: listen — 1:1s with team and stakeholders, understand systems, data, pain points, metrics. 60 days: pick 1–2 quick wins, write a draft strategy. 90 days: agreed roadmap, team processes (design reviews, eval standards, on-call), first improvements shipped.
+30 days: listen. Do 1:1s with team and stakeholders, understand systems, data, pain points, metrics. 60 days: pick 1-2 quick wins, write a draft strategy. 90 days: agreed roadmap, team processes (design reviews, eval standards, on-call), first improvements shipped.
 
 **16. How do you handle an underperforming team member?**
 See §8: specific feedback early, understand causes (skills, clarity, personal issues), a support plan with clear goals, regular follow-up, fair documentation, escalate with HR if needed.
@@ -186,7 +186,7 @@ Early, with the reason, impact, new realistic range, options (cut scope / add pe
 SLOs, monitoring of data/model/system, canary deployments, rollback, runbooks, on-call, postmortems, regular game days, and evals in CI.
 
 **19. Tell me about a mistake that had real impact.**
-Own it fully, explain impact with numbers, what you did immediately, what systemic change prevented recurrence, what you learned. (See failure example in [15](15-behavioral-and-project-deep-dive.md#part-b--behavioral-questions-star-method).)
+Own it fully, explain impact with numbers, what you did immediately, what systemic change prevented recurrence, what you learned. (See failure example in [15](15-behavioral-and-project-deep-dive.md#part-b-behavioral-questions-star-method).)
 
 **20. How do you decide build vs buy for a vector database?**
 Scale (millions vs billions of vectors), existing stack (Postgres → pgvector is often enough), latency/filtering needs, ops skills, cost, data residency. Start simple, abstract the interface, migrate if limits appear.
@@ -222,28 +222,28 @@ Start small with a pilot they choose, show results in their metrics, be transpar
 5. **Prevent:** stronger launch checklist (red-teaming, slice evals, staged rollout, kill switch).
 
 ### Your team strongly disagrees on the approach (fine-tune vs RAG, PyTorch vs JAX, build vs buy)
-Make the disagreement productive: agree on criteria, let each side write a short proposal, run a time-boxed experiment on the same eval set, decide (or escalate with a clear recommendation), document the decision, and ask everyone to commit. Thank the "losing" side — their concerns become risks to monitor.
+Make the disagreement productive: agree on criteria, let each side write a short proposal, run a time-boxed experiment on the same eval set, decide (or escalate with a clear recommendation), document the decision, and ask everyone to commit. Thank the "losing" side. Their concerns become risks to monitor.
 
 ### An executive says "Put GenAI in every product this quarter"
-Don't say no; channel the energy: list candidate use cases, score by value, feasibility, and risk, pick 2–3 high-value pilots with clear metrics, build shared foundations (gateway, evals, guardrails) to make later launches cheap and safe, report results honestly. Explain risks (cost, hallucinations, data privacy) in business terms.
+Don't say no; channel the energy: list candidate use cases, score by value, feasibility, and risk, pick 2-3 high-value pilots with clear metrics, build shared foundations (gateway, evals, guardrails) to make later launches cheap and safe, report results honestly. Explain risks (cost, hallucinations, data privacy) in business terms.
 
 ### The deadline is impossible
-Clarify what's truly fixed (date? scope? quality?). Offer options: reduced scope (MVP), phased launch, more people (with ramp-up cost), or a new date. Give your recommendation with confidence ranges. Don't silently burn the team out or cut evaluation and safety.
+Clarify what's really fixed (date? scope? quality?). Offer options: reduced scope (MVP), phased launch, more people (with ramp-up cost), or a new date. Give your recommendation with confidence ranges. Don't silently burn the team out or cut evaluation and safety.
 
 ### Your key engineer resigns in the middle of a critical project
 Short-term: knowledge transfer plan for the notice period (docs, recorded walkthroughs, pairing), reassign ownership, re-plan timeline with stakeholders. Long-term: reduce bus factor (see Q22), understand why they left (stay interviews with others), backfill hiring.
 
 ### An engineer raises an ethical concern about a model (bias, privacy, misuse)
-Take it seriously and thank them — psychological safety matters. Pause launch if the risk is real; investigate with data (slice metrics, privacy review); involve legal/ethics/responsible-AI team; decide transparently and document; fix or stop. Never punish the person who raised it.
+Take it seriously and thank them. People need to feel safe raising concerns. Pause launch if the risk is real; investigate with data (slice metrics, privacy review); involve legal/ethics/responsible-AI team; decide transparently and document; fix or stop. Never punish the person who raised it.
 
 ### Product wants to launch, but evaluations show the model isn't ready
 Show the evidence in business terms (error rate, affected users, risk), propose alternatives (limited beta, human review, narrower scope, feature flag with staged rollout), agree on launch criteria together. If overruled, document the risk and ensure monitoring + kill switch.
 
 ### Two teams built overlapping ML platforms
-Map both (users, features, costs), meet both leads, agree on a target architecture and a migration path, avoid "winner and loser" framing — merge the best parts, set timeline and ownership.
+Map both (users, features, costs), meet both leads, agree on a target architecture and a migration path, avoid "winner and loser" framing, merge the best parts, set timeline and ownership.
 
 ### Your team's model costs more to run than the revenue it creates
 Measure unit economics (cost per prediction vs value), then: optimize (smaller models, caching, batching, routing), reprice or limit usage, or retire the feature. Present options with numbers to leadership.
 
 ### A regulator or big customer asks "how does your AI make decisions?"
-Provide documentation you should already have: model cards, data sources and lineage, evaluation results by segment, human oversight process, explanation methods, incident history and controls. If you don't have them — that's a priority action item.
+Provide documentation you should already have: model cards, data sources and lineage, evaluation results by segment, human oversight process, explanation methods, incident history and controls. If you don't have them, that's a priority action item.

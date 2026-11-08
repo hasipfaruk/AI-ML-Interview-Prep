@@ -1,4 +1,4 @@
-# 23 — Industry Playbooks: AI/ML Interviews in Every Industry
+# 23. Industry Playbooks: AI/ML Interviews in Every Industry
 
 Interviewers at a bank, a hospital or a game studio ask the same ML questions, but they expect answers that fit **their** world:
 their regulations, their cost of mistakes, their data. This chapter gives you that context for 20 industries.
@@ -40,14 +40,14 @@ For each industry you get:
 ## 0. How to adapt any answer to any industry
 
 Before you answer any design or "what if" question for a specific company, run this checklist in your head.
-Saying 2–3 of these points out loud immediately makes you sound like you understand their business.
+If you say 2-3 of these points out loud, the interviewer can tell you understand their business.
 
 | Question to ask yourself | Why it changes the design | Example |
 |---|---|---|
 | **Who is harmed by an error, and how badly?** | Decides precision vs recall, thresholds, human review | Missed cancer (very bad) vs a bad movie recommendation (minor) |
 | **Which regulations apply?** | Decides data storage, explainability, audit logs, consent | HIPAA (health), GDPR (EU data), fair lending laws, EU AI Act |
 | **What is the latency budget?** | Decides batch vs real-time, model size | Fraud check < 100 ms; crop yield forecast: daily batch is fine |
-| **Where do labels come from?** | Decides how fast you can train and evaluate | Clicks (instant), chargebacks (30–90 days), doctors (expensive) |
+| **Where do labels come from?** | Decides how fast you can train and evaluate | Clicks (instant), chargebacks (30-90 days), doctors (expensive) |
 | **How delayed is feedback?** | Decides monitoring strategy | Loan default after months → use proxy metrics |
 | **Does the decision need to be explained?** | Decides model choice (simple vs deep), SHAP, reason codes | Loan denial must give reasons by law |
 | **How sensitive is the data?** | Decides privacy tech: anonymization, on-prem, federated learning | Patient records, children's data, location |
@@ -78,7 +78,7 @@ Saying 2–3 of these points out loud immediately makes you sound like you under
 **Business metrics:** sensitivity/specificity at clinically chosen operating point, time saved per clinician, reduction in readmissions, diagnostic turnaround time, regulatory approval, clinician adoption rate.
 
 **Case study: sepsis early warning in a hospital**
-- Requirements: alert nurses 4–6 hours before sepsis, using vitals and lab results every 15 minutes; low false-alarm rate; explanation for each alert.
+- Requirements: alert nurses 4-6 hours before sepsis, using vitals and lab results every 15 minutes; low false-alarm rate; explanation for each alert.
 ```
 Bedside monitors + lab system + EHR (HL7/FHIR feeds)
         │
@@ -176,7 +176,7 @@ Store orders → actual sales → accuracy monitoring by category
 - **Forecast badly missed during a promotion.** Promo not in features, or new promo type; cannibalization of other products. Add promo features, uplift models, planner overrides with feedback.
 - **Search returns zero results for 15% of queries.** Spelling errors, synonyms, other languages, out-of-catalog items. Fix: spell correction, synonym mining from query logs, semantic search, query relaxation; track zero-result rate.
 - **Dynamic pricing raised prices during an emergency and caused bad press.** Add business rules and price caps, human approval for large changes, fairness and reputation checks; not everything should be optimized.
-- **Fake reviews are rising.** Classifier on text + behavior (account age, review bursts, purchase verified), graph of reviewer–seller links, human moderation for top sellers.
+- **Fake reviews are rising.** Classifier on text + behavior (account age, review bursts, purchase verified), graph of reviewer-seller links, human moderation for top sellers.
 
 **Vocabulary:** GMV, AOV, conversion funnel, CTR, add-to-cart, basket analysis, collaborative filtering, cold start, price elasticity, cannibalization, SKU, stock-out, safety stock, MAPE/WAPE, hierarchical forecasting, uplift modeling.
 
@@ -186,7 +186,7 @@ Store orders → actual sales → accuracy monitoring by category
 
 **Use cases:** click-through rate (CTR) and conversion rate (CVR) prediction, real-time bidding, budget pacing, audience targeting and lookalike modeling, attribution, creative generation and testing, customer lifetime value, marketing mix modeling, uplift modeling for campaigns.
 
-**Data & constraints:** billions of impressions per day, extremely sparse categorical features, delayed conversions (hours to days). Latency: bid decisions in ~10–100 ms. Privacy: cookie deprecation, consent (GDPR, CCPA), Apple ATT. Calibration matters because predicted probabilities directly set bid prices.
+**Data & constraints:** billions of impressions per day, extremely sparse categorical features, delayed conversions (hours to days). Latency: bid decisions in ~10-100 ms. Privacy: cookie deprecation, consent (GDPR, CCPA), Apple ATT. Calibration matters because predicted probabilities directly set bid prices.
 
 **Business metrics:** revenue, ROAS (return on ad spend), CPA (cost per acquisition), CPM/CPC, advertiser retention, auction efficiency, calibration error, incremental lift.
 
@@ -242,7 +242,7 @@ Signup / activity events → real-time rules (rate limits, known bad IPs) → bl
 
 **Use cases:** web/document retrieval, query understanding (spelling, intent, entities), learning to rank, query autocomplete, snippets and answer extraction, AI-generated answers with citations, spam/SEO-spam detection, freshness for news, personalization, image and voice search.
 
-**Data & constraints:** web-scale index (billions of documents), query logs, click logs (biased by position). Latency: < 200–500 ms end to end. Freshness matters for news. Quality judged by human raters plus clicks.
+**Data & constraints:** web-scale index (billions of documents), query logs, click logs (biased by position). Latency: < 200-500 ms end to end. Freshness matters for news. Quality judged by human raters plus clicks.
 
 **Business metrics:** nDCG on rated queries, click-through and long-click rate, abandonment (no click), query reformulation rate, time to success, ad revenue, freshness lag.
 
@@ -432,7 +432,7 @@ Teacher dashboard (progress, struggling students, flagged conversations)
 
 **Business metrics:** time to hire, quality of hire (performance, retention), recruiter productivity, candidate experience, diversity of pipeline, application completion rate.
 
-**Case study: resume–job matching**
+**Case study: resume-job matching**
 ```
 Job description → skill & requirement extraction (LLM / NER) ─┐
 Resume → parsing (layout + NER) → skills, experience, education ─┴→ matching model (embeddings + structured features)
@@ -649,7 +649,7 @@ Application (web or scanned paper) → document AI (OCR + field extraction) → 
 | Education | [09](09-nlp-and-llms.md), [02](02-ml-and-llm-systems.md), [11](11-statistics-and-ab-testing.md) |
 | HR tech & recruiting | [09](09-nlp-and-llms.md), [07 §9](07-ml-fundamentals.md#9-what-if-scenarios), [04 #29](04-what-if-scenarios.md#29-model-is-biased-against-a-user-group) |
 | Legal & compliance | [02 §7](02-ml-and-llm-systems.md#7-llm-systems-rag-in-depth), [04 A](04-what-if-scenarios.md#a-rag-systems), [05 #1](05-case-studies.md#1-enterprise-rag-assistant-multi-tenant) |
-| Cybersecurity | [07](07-ml-fundamentals.md), [04 #15](04-what-if-scenarios.md#15-prompt-injection-a-user-made-the-bot-reveal-its-system-prompt--ignore-rules), [01 §7](01-fundamentals.md#part-7--reliability-monitoring-security) |
+| Cybersecurity | [07](07-ml-fundamentals.md), [04 #15](04-what-if-scenarios.md#15-prompt-injection-a-user-made-the-bot-reveal-its-system-prompt--ignore-rules), [01 §7](01-fundamentals.md#part-7-reliability-monitoring-security) |
 | Gaming | [11](11-statistics-and-ab-testing.md), [07](07-ml-fundamentals.md), [01](01-fundamentals.md) |
 | Travel & hospitality | [05 #4, #6](05-case-studies.md), [11](11-statistics-and-ab-testing.md) |
 | Media & streaming | [05 #4](05-case-studies.md#4-recommendation-system), [04 F](04-what-if-scenarios.md#f-recommenders-search--ranking), [11](11-statistics-and-ab-testing.md) |

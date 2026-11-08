@@ -1,6 +1,6 @@
-# 18 — Recommender Systems (Deep Dive)
+# 18. Recommender Systems (Deep Dive)
 
-Asked at e-commerce, streaming, social media, food delivery, ads, news, jobs and dating companies — one of the most common ML system design topics.
+Asked at e-commerce, streaming, social media, food delivery, ads, news, jobs and dating companies. It is one of the most common ML system design topics.
 For a full design answer see [05-case-studies.md](05-case-studies.md#4-recommendation-system).
 
 ### Contents
@@ -23,7 +23,7 @@ For a full design answer see [05-case-studies.md](05-case-studies.md#4-recommend
 
 **Q: What does a recommender system do?** Predicts which items (products, videos, songs, jobs) a user will find valuable, and ranks them. Business goals: engagement, conversion, retention, revenue, discovery.
 
-**Q: Explicit vs implicit feedback?** Explicit: ratings, likes (rare, clear meaning). Implicit: clicks, watch time, purchases, skips (plentiful, noisy, no true negatives — "not clicked" may mean "not seen").
+**Q: Explicit vs implicit feedback?** Explicit: ratings, likes (rare, clear meaning). Implicit: clicks, watch time, purchases, skips (plentiful, noisy, no true negatives: "not clicked" may mean "not seen").
 
 **Q: Main approaches?** Popularity-based, collaborative filtering (users who liked X also liked Y), content-based (item attributes), hybrid, deep learning (two-tower, sequence models), knowledge/graph-based, and bandits/RL for exploration.
 
@@ -31,17 +31,17 @@ For a full design answer see [05-case-studies.md](05-case-studies.md#4-recommend
 
 ## 2. Collaborative filtering & matrix factorization
 
-**Q: User-based vs item-based collaborative filtering?** User-based: find similar users, recommend what they liked. Item-based: find items similar to ones the user liked (based on co-interaction). Item-based is more stable (item similarities change slowly) and easier to precompute — used by Amazon early on.
+**Q: User-based vs item-based collaborative filtering?** User-based: find similar users, recommend what they liked. Item-based: find items similar to ones the user liked (based on co-interaction). Item-based is more stable (item similarities change slowly) and easier to precompute. Amazon used it early on.
 
 **Q: Similarity measures?** Cosine, Pearson correlation, Jaccard (for binary interactions).
 
-**Q: Matrix factorization?** Approximate the interaction matrix R ≈ U·Vᵀ, where each user and item gets a low-dimensional vector (embedding). Predicted score = dot product. Train with SGD or **ALS** (alternating least squares — scales well, good for implicit data).
+**Q: Matrix factorization?** Approximate the interaction matrix R ≈ U·Vᵀ, where each user and item gets a low-dimensional vector (embedding). Predicted score = dot product. Train with SGD or **ALS** (alternating least squares; scales well, good for implicit data).
 
 **Q: Implicit-feedback MF?** Treat all interactions as positive with confidence weights (more views → more confidence), unobserved as weak negatives (Hu-Koren-Volinsky). Or use ranking losses (BPR).
 
 **Q: Weaknesses of collaborative filtering?** Cold start (new users/items have no interactions), popularity bias, sparsity, can't use content/context features directly.
 
-**Q: Factorization Machines (FM)?** Model pairwise interactions between all features (user, item, context) with factorized weights — generalizes MF to include side features. Extensions: FFM, DeepFM.
+**Q: Factorization Machines (FM)?** Model pairwise interactions between all features (user, item, context) with factorized weights. It generalizes MF to include side features. Extensions: FFM, DeepFM.
 
 ## 3. Content-based & hybrid
 
@@ -49,13 +49,13 @@ For a full design answer see [05-case-studies.md](05-case-studies.md#4-recommend
 
 **Q: How do you create item embeddings from content?** Text encoders (sentence embeddings of title/description), image encoders (CLIP), audio embeddings, or LLM-generated attribute tags.
 
-**Q: Hybrid systems?** Combine CF and content signals — e.g., content features as inputs to a two-tower model, or blend scores. Best of both: personalization + cold-start handling.
+**Q: Hybrid systems?** Combine CF and content signals, e.g., content features as inputs to a two-tower model, or blend scores. Best of both: personalization + cold-start handling.
 
 **Q: Can LLMs be used in recommendation?** Yes: generating item descriptions/tags, embeddings, conversational recommendation, explaining recommendations, re-ranking small candidate sets, and generative retrieval. Main limits: latency and cost at large scale, so usually used offline or at the last stage.
 
 ## 4. The multi-stage architecture
 
-**Q: Why multiple stages?** You can't run a heavy model on millions of items per request within 100–200 ms. So you narrow down step by step:
+**Q: Why multiple stages?** You can't run a heavy model on millions of items per request within 100-200 ms. So you narrow down step by step:
 ```
 All items (10M)
   → Candidate generation / retrieval (≈ 1,000)   cheap: ANN on embeddings, co-occurrence, popular, followed
@@ -76,7 +76,7 @@ All items (10M)
 
 **Q: ANN indexes for retrieval?** HNSW, IVF, ScaNN, FAISS. Trade-off recall vs latency vs memory. Refresh index as new items arrive (incremental updates or frequent rebuilds). See [02 §7](02-ml-and-llm-systems.md#7-llm-systems-rag-in-depth).
 
-**Q: Other retrieval methods?** Item-to-item co-occurrence ("bought together"), graph-based (random walks — PinSage), rule-based (trending in your city), and search queries.
+**Q: Other retrieval methods?** Item-to-item co-occurrence ("bought together"), graph-based (random walks, PinSage), rule-based (trending in your city), and search queries.
 
 ## 6. Ranking models & features
 
@@ -104,8 +104,8 @@ All items (10M)
 
 **Q: Negative sampling for retrieval?**
 - **Random negatives:** cheap, easy negatives (model learns popular vs unpopular).
-- **In-batch negatives:** other users' positives in the batch — efficient but biased toward popular items → apply **logQ correction**.
-- **Hard negatives:** items similar to positives but not engaged — improve precision; too hard → false negatives.
+- **In-batch negatives:** other users' positives in the batch. Efficient, but biased toward popular items → apply **logQ correction**.
+- **Hard negatives:** items similar to positives but not engaged. They improve precision; if too hard, you get false negatives.
 - Mix of easy + hard is common.
 
 **Q: Losses?**
@@ -113,7 +113,7 @@ All items (10M)
 |---|---|
 | Binary cross-entropy (pointwise) | CTR prediction in ranking |
 | **BPR** (pairwise) | score(positive) > score(negative) for implicit feedback |
-| **Sampled softmax** | retrieval — positive vs many sampled negatives |
+| **Sampled softmax** | retrieval: positive vs many sampled negatives |
 | Listwise (LambdaRank, softmax over list) | optimize ranking metrics like nDCG |
 | Contrastive / InfoNCE | two-tower training |
 
@@ -132,7 +132,7 @@ Request → fetch fresh features → retrieval + ranking → response
 ```
 Also: update user embedding online (from recent items) without retraining, near-real-time training (hourly incremental updates).
 
-**Q: Generative recommenders?** Large sequence models trained on user action sequences (and semantic item IDs) that generate the next items directly — an active trend at large companies.
+**Q: Generative recommenders?** Large sequence models trained on user action sequences (and semantic item IDs) that generate the next items directly. Large companies are actively working on this.
 
 ## 9. Evaluation
 
@@ -143,7 +143,7 @@ Also: update user embedding online (from recent items) without retraining, near-
 
 **Q: Offline evaluation protocol?** Time-based split (train on past, test on future), never random split. Leave-last-out per user for sequential models. Evaluate on all candidates or a fair sample (sampled metrics can mislead).
 
-**Q: Online evaluation?** A/B tests with primary metric (watch time, purchases, retention) + guardrails (latency, diversity, complaints, creator-side metrics). **Interleaving** (mix results from two rankers in one list, see which gets more clicks) — needs 10–100× less traffic to detect a winner, good for fast ranker iteration.
+**Q: Online evaluation?** A/B tests with primary metric (watch time, purchases, retention) + guardrails (latency, diversity, complaints, creator-side metrics). **Interleaving** (mix results from two rankers in one list, see which gets more clicks). It needs 10-100× less traffic to detect a winner, good for fast ranker iteration.
 
 **Q: Why do offline and online results disagree?** Logged data only contains items the old model showed (selection bias); offline metrics ignore position effects, diversity, freshness, latency; short-term clicks ≠ long-term satisfaction. See [04 #28](04-what-if-scenarios.md#28-new-model-won-the-offline-evaluation-but-lost-the-ab-test).
 
@@ -167,7 +167,7 @@ Also: update user embedding online (from recent items) without retraining, near-
 
 **Q: How to combine multiple objectives?** Weighted score: `score = w1·P(click) + w2·E[watch time] + w3·P(like) − w4·P(hide)`; tune weights with online experiments; or constrained optimization (maximize engagement subject to diversity/quality constraints); Pareto-optimal tuning.
 
-**Q: Diversity in re-ranking?** **MMR** (maximal marginal relevance — trade relevance against similarity to already-picked items), DPP (determinantal point processes), category caps ("max 2 items from same creator in top 10").
+**Q: Diversity in re-ranking?** **MMR** (maximal marginal relevance: trade relevance against similarity to already-picked items), DPP (determinantal point processes), category caps ("max 2 items from same creator in top 10").
 
 **Q: Other re-ranking rules?** Remove already-purchased/watched, dedupe near-duplicates, freshness boosts, policy/safety filters, business rules (sponsored slots, inventory availability), fairness for creators/sellers.
 

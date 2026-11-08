@@ -1,4 +1,4 @@
-# 19 — Speech & Audio AI
+# 19. Speech & Audio AI
 
 Asked for voice assistants, call-center AI, meeting transcription, voice agents, media, accessibility and smart-device roles.
 
@@ -25,7 +25,7 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 **Q: What breaks if sampling rates don't match?** A model trained on 16 kHz fed 8 kHz audio (or vice versa) without resampling produces garbage. Always resample to the model's expected rate.
 
-**Q: Mono vs stereo?** Speech models usually take mono. In call centers, stereo with **agent and customer on separate channels** makes diarization trivial — keep it if available.
+**Q: Mono vs stereo?** Speech models usually take mono. In call centers, stereo with **agent and customer on separate channels** makes diarization trivial, so keep it if you have it.
 
 **Q: Audio formats/codecs?** WAV/PCM (uncompressed), FLAC (lossless), MP3/AAC/Opus (lossy). Telephony codecs (G.711 μ-law) and heavy compression reduce ASR accuracy.
 
@@ -35,7 +35,7 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 **Q: Mel spectrogram?** Spectrogram with frequencies mapped to the **mel scale**, which matches human hearing (more resolution at low frequencies), usually with log amplitude. Standard input for modern speech models (e.g., 80 mel bins).
 
-**Q: MFCC?** Mel-frequency cepstral coefficients — apply a DCT on the log mel spectrogram to get a compact (13–40) decorrelated representation. Classic for older ASR/speaker models; deep models now mostly use log-mel or raw waveform.
+**Q: MFCC?** Mel-frequency cepstral coefficients. Apply a DCT on the log mel spectrogram to get a compact (13-40) decorrelated representation. Classic for older ASR/speaker models; deep models now mostly use log-mel or raw waveform.
 
 **Q: Raw waveform models?** wav2vec 2.0, HuBERT learn features directly from the waveform with self-supervised pretraining.
 
@@ -48,16 +48,16 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 |---|---|---|
 | **CTC** | predicts a label per frame including a "blank"; collapse repeats and blanks | no alignment needed; assumes frame outputs independent → benefits from external LM; streaming-friendly |
 | **Attention encoder-decoder** (LAS, Whisper) | decoder attends to encoded audio and generates text | high accuracy; not naturally streaming; can **hallucinate** |
-| **RNN-Transducer (RNN-T)** | encoder + prediction network + joiner | streaming, accurate — used in on-device assistants |
+| **RNN-Transducer (RNN-T)** | encoder + prediction network + joiner | streaming, accurate; used in on-device assistants |
 | Hybrid CTC/attention | multi-task | stable training |
 
-**Q: Conformer?** Encoder combining convolution (local patterns) and self-attention (global context) — standard ASR encoder.
+**Q: Conformer?** Encoder combining convolution (local patterns) and self-attention (global context). The standard ASR encoder.
 
 **Q: Self-supervised speech models?** wav2vec 2.0 / HuBERT / WavLM: pretrain on unlabeled audio by predicting masked parts, fine-tune with little labeled data → great for low-resource languages.
 
-**Q: Whisper-style models?** Encoder-decoder Transformer trained on huge weakly-labeled multilingual data; does transcription, translation, language ID, timestamps. Strengths: robust to noise and accents. Weaknesses: 30-second windows, not truly streaming, can hallucinate text on silence/noise, slower than CTC models.
+**Q: Whisper-style models?** Encoder-decoder Transformer trained on huge weakly-labeled multilingual data; does transcription, translation, language ID, timestamps. Strengths: robust to noise and accents. Weaknesses: 30-second windows, not built for real-time streaming, can hallucinate text on silence/noise, slower than CTC models.
 
-**Q: Streaming vs batch ASR?** Streaming outputs words while the user talks (needed for voice agents, live captions) — uses chunked/causal encoders, CTC or RNN-T, partial and final hypotheses. Batch processes full files — better accuracy (can see future context).
+**Q: Streaming vs batch ASR?** Streaming outputs words while the user talks (needed for voice agents, live captions). It uses chunked/causal encoders, CTC or RNN-T, partial and final hypotheses. Batch processes full files and gets better accuracy (can see future context).
 
 **Q: Role of a language model in ASR?** Rescoring or shallow fusion with an LM improves rare words and grammar. **Contextual biasing / hotwords** boost domain terms (product names, contact names).
 
@@ -67,7 +67,7 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 **Q: WER?** Word Error Rate = (Substitutions + Deletions + Insertions) / number of words in reference. Can be > 100% (many insertions). **CER** (character error rate) for languages without spaces (Chinese, Japanese) or for names.
 
-**Q: What normalization before WER?** Lowercase, remove punctuation, normalize numbers ("25" vs "twenty-five"), contractions — otherwise WER penalizes formatting, not recognition.
+**Q: What normalization before WER?** Lowercase, remove punctuation, normalize numbers ("25" vs "twenty-five"), contractions. Otherwise WER penalizes formatting, not recognition.
 
 **Q: Beyond WER?** Entity/keyword error rate (did we get the account number right?), latency (first partial, final result), real-time factor (RTF = processing time / audio duration), WER by segment (accent, noise level, device), downstream task success (intent accuracy).
 
@@ -77,7 +77,7 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 **Q: Key TTS models?** Tacotron 2 (attention seq2seq → mel), FastSpeech 2 (non-autoregressive, fast, duration predictor), **VITS** (end-to-end with VAE + flow + GAN, no separate vocoder), neural codec language models (generate audio tokens, zero-shot voice cloning from a few seconds), diffusion/flow-matching TTS.
 
-**Q: Vocoders?** WaveNet (high quality, slow), WaveRNN, **HiFi-GAN** (fast, high quality — common), neural audio codecs (EnCodec/SoundStream) for token-based models.
+**Q: Vocoders?** WaveNet (high quality, slow), WaveRNN, **HiFi-GAN** (fast, high quality, common), neural audio codecs (EnCodec/SoundStream) for token-based models.
 
 **Q: TTS evaluation?** **MOS** (mean opinion score from human raters), intelligibility (run ASR on output → WER), speaker similarity (embedding cosine), latency (time to first audio), naturalness of prosody.
 
@@ -99,7 +99,7 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 ## 8. Data & augmentation
 
-**Q: Data augmentation for speech?** **SpecAugment** (mask random time and frequency bands on spectrogram — the most important trick), speed perturbation (0.9×/1.1×), adding background noise (MUSAN), room impulse responses (reverb), codec/telephony simulation, volume changes, pitch shift.
+**Q: Data augmentation for speech?** **SpecAugment** (mask random time and frequency bands on the spectrogram; the most important trick), speed perturbation (0.9×/1.1×), adding background noise (MUSAN), room impulse responses (reverb), codec/telephony simulation, volume changes, pitch shift.
 
 **Q: Where does labeled data come from?** Public datasets (LibriSpeech, Common Voice), in-house transcriptions, pseudo-labeling with a strong model + filtering by confidence, synthetic speech from TTS for rare words.
 
@@ -110,27 +110,27 @@ Asked for voice assistants, call-center AI, meeting transcription, voice agents,
 
 **Pipeline (cascaded):**
 ```
-Caller audio (telephony / WebRTC, 8–16 kHz)
+Caller audio (telephony / WebRTC, 8-16 kHz)
   → streaming VAD + end-of-turn detection
   → streaming ASR (partial + final transcripts, with hotwords for names/services)
-  → LLM (dialogue + tools: check_availability, book_slot) — stream tokens
+  → LLM (dialogue + tools: check_availability, book_slot), stream tokens
   → streaming TTS (start speaking after first sentence/phrase)
   → audio back to caller
 Barge-in: if the caller starts talking while TTS plays → stop TTS immediately, listen
 Logging, transcripts with PII redaction, human handoff, analytics
 ```
-**Latency budget (target ~0.8–1.2 s from user stops talking → agent starts speaking):**
+**Latency budget (target ~0.8-1.2 s from user stops talking → agent starts speaking):**
 | Stage | Typical |
 |---|---|
-| End-of-turn detection | 200–500 ms (biggest hidden delay) |
-| ASR final | 100–300 ms |
-| LLM time to first token | 200–500 ms |
-| TTS time to first audio | 100–300 ms |
-| Network/telephony | 100–200 ms |
+| End-of-turn detection | 200-500 ms (biggest hidden delay) |
+| ASR final | 100-300 ms |
+| LLM time to first token | 200-500 ms |
+| TTS time to first audio | 100-300 ms |
+| Network/telephony | 100-200 ms |
 
 **Ways to cut latency:** streaming everywhere, smarter end-of-turn models (semantic + acoustic, not just silence timeout), start LLM on partial transcripts (speculatively), small/fast LLM for routine turns, short first sentence, filler phrases ("Let me check that…") while tools run, colocate services, cache common responses.
 
-**Alternative:** **speech-to-speech models** (audio in, audio out, one model) — lower latency, better prosody and emotion, but less control, harder to debug, tool use and guardrails are harder. Cascaded is easier to inspect and improve per stage.
+**Alternative:** **speech-to-speech models** (audio in, audio out, one model). Lower latency, better prosody and emotion, but less control, harder to debug, tool use and guardrails are harder. Cascaded is easier to inspect and improve per stage.
 
 **Deep dives to mention:** dialogue state and slot confirmation ("Tuesday 3 PM, correct?"), spelling of names/emails (letter-by-letter mode, confirmation), DTMF keypad fallback, handling silence and noisy lines, human escalation, compliance (call recording disclosure), evaluation with simulated callers, metrics (task completion, average handle time, transfer rate, latency p95).
 
@@ -155,9 +155,9 @@ Use the C.L.H.I.F.P. method from [03-debugging-framework.md](03-debugging-framew
 ### Accuracy is terrible on noisy call-center audio
 **Causes:** 8 kHz narrowband telephony while model trained on 16 kHz clean audio; background noise; heavy compression; crosstalk.
 **Isolate:** compare WER on clean vs call audio; check sampling rate pipeline (accidental resampling bugs, wrong μ-law decoding).
-**Fix:** use telephony-trained or fine-tuned models, augment training with noise + codec simulation, noise suppression (careful — can hurt ASR), use stereo channel separation, hotwords for domain terms.
+**Fix:** use telephony-trained or fine-tuned models, augment training with noise + codec simulation, noise suppression (careful, it can hurt ASR), use stereo channel separation, hotwords for domain terms.
 
-### The voice bot is too slow — users talk over it or hang up
+### The voice bot is too slow: users talk over it or hang up
 Trace each stage (see §9 budget). Usual culprits: end-of-turn silence timeout too long, non-streaming ASR or TTS, big LLM, sequential tool calls, cross-region hops. Fix with streaming, better turn detection, smaller model routing, fillers during tool calls, colocation. Monitor p95 "user stopped → bot started" latency.
 
 ### ASR outputs text that was never said (hallucinations on silence or music)

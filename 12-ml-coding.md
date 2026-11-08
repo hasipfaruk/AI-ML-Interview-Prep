@@ -1,6 +1,6 @@
-# 12 — ML Coding Round (Implement From Scratch)
+# 12. ML Coding Round (Implement From Scratch)
 
-Interviewers ask you to code ML pieces using only NumPy (or PyTorch) in 30–45 minutes.
+Interviewers ask you to code ML pieces using only NumPy (or PyTorch) in 30-45 minutes.
 **Practice:** type each one from memory until you can do it in < 15 minutes. Talk while coding: shapes, edge cases, complexity.
 
 ### Contents
@@ -125,7 +125,7 @@ def roc_auc(y_true, scores):
     ranks = np.empty(len(scores)); ranks[order] = np.arange(1, len(scores) + 1)
     n_pos = y_true.sum(); n_neg = len(y_true) - n_pos
     return (ranks[y_true == 1].sum() - n_pos * (n_pos + 1) / 2) / (n_pos * n_neg)
-    # (ties need average ranks — mention it)
+    # (ties need average ranks; mention this in the interview)
 ```
 
 ## 6. Softmax & cross-entropy
@@ -274,7 +274,7 @@ def top_k_cosine(query, matrix, k=5):          # query (d,), matrix (n, d)
     idx = np.argpartition(-sims, k)[:k]
     idx = idx[np.argsort(-sims[idx])]          # sort the top-k only
     return idx, sims[idx]
-# Brute force O(n·d). At scale: ANN index (HNSW/IVF) — see 02 §7.
+# Brute force O(n·d). At scale, use an ANN index (HNSW/IVF). See 02 §7.
 ```
 
 ## 12. BPE merge step

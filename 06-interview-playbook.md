@@ -1,36 +1,41 @@
-# 06 — Interview Playbook & Cheat Sheet
+# 06. Interview Playbook & Cheat Sheet
 
 ## A. The 45-minute "Design X" script
 
 | Time | Step | What you say / do |
 |------|------|-------------------|
-| 0–5 min | **Requirements** | "Let me clarify scope." Functional (3–5 features), non-functional (scale, latency, accuracy, cost, privacy). Write them down. Ask: *who are the users, how many, what matters most?* |
-| 5–8 min | **Estimates** | QPS, storage, tokens/cost. Then **say what it means**: "So cost, not QPS, is the bottleneck." |
-| 8–12 min | **API** | 3–5 endpoints. Mention streaming for LLMs. |
-| 12–25 min | **High-level design** | Draw boxes & arrows. Walk one request end to end. For ML: show **offline** (data, training/ingestion) and **online** (serving) paths separately. |
-| 25–38 min | **Deep dives** | Pick 2–3 hardest parts (or ask: "Which part would you like me to go deeper on?"). Data model, retrieval/ranking, scaling, evaluation. |
-| 38–45 min | **What-ifs, trade-offs, monitoring** | Failure modes, bottlenecks, how you'd evaluate & monitor, what you'd do with more time. |
+| 0-5 min | **Requirements** | "Let me clarify scope." Functional (3-5 features), non-functional (scale, latency, accuracy, cost, privacy). Write them down. Ask: *who are the users, how many, what matters most?* |
+| 5-8 min | **Estimates** | QPS, storage, tokens/cost. Then **say what it means**: "So cost, not QPS, is the bottleneck." |
+| 8-12 min | **API** | 3-5 endpoints. Mention streaming for LLMs. |
+| 12-25 min | **High-level design** | Draw boxes & arrows. Walk one request end to end. For ML: show **offline** (data, training/ingestion) and **online** (serving) paths separately. |
+| 25-38 min | **Deep dives** | Pick 2-3 hardest parts (or ask: "Which part would you like me to go deeper on?"). Data model, retrieval/ranking, scaling, evaluation. |
+| 38-45 min | **What-ifs, trade-offs, monitoring** | Failure modes, bottlenecks, how you'd evaluate & monitor, what you'd do with more time. |
 
 ## B. The "What if X happens?" script
 Use **C.L.H.I.F.P.** from [03-debugging-framework.md](03-debugging-framework.md):
 1. **Clarify** the symptom (who / when / since when / what changed).
-2. **Layer map** — draw the pipeline.
+2. **Layer map**: draw the pipeline.
 3. **Hypotheses** ranked by likelihood.
-4. **Isolate** — cheapest test first; find the first layer where output differs.
-5. **Fix** — mitigation now + root-cause fix later.
-6. **Prevent** — evals, monitoring, alerts, versioning.
+4. **Isolate**: cheapest test first; find the first layer where output differs.
+5. **Fix**: mitigation now + root-cause fix later.
+6. **Prevent**: evals, monitoring, alerts, versioning.
 
-## C. Things interviewers secretly score
-- ✅ You asked clarifying questions before designing.
-- ✅ You stated assumptions out loud.
-- ✅ You drove the conversation (didn't wait to be led).
-- ✅ You explained **trade-offs** ("I chose X over Y because…, the cost is…").
-- ✅ You covered evaluation and monitoring (huge for ML roles).
-- ✅ You started simple, then scaled ("for v1 I'd use pgvector; at 100M vectors I'd move to…").
-- ✅ You handled pushback calmly ("Good point — in that case I'd change…").
-- ❌ Jumping into a model architecture before understanding the problem.
-- ❌ Buzzword lists without reasons.
-- ❌ Silence. ❌ Over-engineering for 5 QPS. ❌ Ignoring cost/latency of LLMs.
+## C. What interviewers actually score
+**Points in your favor:**
+- You asked clarifying questions before designing.
+- You stated assumptions out loud.
+- You drove the conversation (didn't wait to be led).
+- You explained **trade-offs** ("I chose X over Y because…, the cost is…").
+- You covered evaluation and monitoring (very important for ML roles).
+- You started simple, then scaled ("for v1 I'd use pgvector; at 100M vectors I'd move to…").
+- You handled pushback calmly ("Good point. In that case I'd change…").
+
+**Points against you:**
+- Jumping into a model architecture before understanding the problem.
+- Listing buzzwords without reasons.
+- Long silences.
+- Over-engineering a system that only gets 5 QPS.
+- Ignoring the cost and latency of LLM calls.
 
 ## D. Trade-off sentences (memorize the shape)
 - "**X gives us** lower latency, **at the cost of** staleness, **which is acceptable here because** …"
@@ -61,14 +66,14 @@ Use **C.L.H.I.F.P.** from [03-debugging-framework.md](03-debugging-framework.md)
 2. Design a chatbot/agent for customer support. *(05 #2)*
 3. How would you evaluate an LLM application? *(02 §10)*
 4. How do you reduce hallucinations? *(04 #3)*
-5. RAG vs fine-tuning — when each? *(02 §12)*
+5. RAG vs fine-tuning: when to use each? *(02 §12)*
 6. How do you reduce LLM latency / cost? *(04 #6, #11, 02 §8)*
 7. Design a recommendation system. *(05 #4)*
 8. Design fraud detection. *(05 #5)*
-9. Model works offline but not in production — why? *(04 #23)*
+9. Model works offline but not in production. Why? *(04 #23)*
 10. How do you detect and handle drift? *(04 #24)*
 11. How do you deploy a new model safely? *(02 §5, 04 #43)*
-12. Same question, different answers — why? *(03 worked example)*
+12. Same question, different answers. Why? *(03 worked example)*
 13. How to handle multi-tenant data isolation? *(04 #7)*
 14. How to serve a 70B model? *(02 §8, 04 #41)*
 15. How do you defend against prompt injection? *(04 #15)*
@@ -83,4 +88,4 @@ Use **C.L.H.I.F.P.** from [03-debugging-framework.md](03-debugging-framework.md)
 **Practice partners:** a friend, a peer engineer, or ask an AI to play interviewer: *"Act as a senior ML interviewer. Ask me a system design question, then push back with 'what if' failure scenarios. Score me on structure, trade-offs, and depth."*
 
 ## H. If you blank out in the interview
-Say: *"Let me take a step back and walk through the request path."* — then draw the pipeline. Your layer map will give you the next thing to say. Every time.
+Say: *"Let me take a step back and walk through the request path."* Then draw the pipeline. Your layer map will give you the next thing to say.

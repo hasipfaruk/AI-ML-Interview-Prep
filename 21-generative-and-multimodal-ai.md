@@ -1,4 +1,4 @@
-# 21 — Generative & Multimodal AI
+# 21. Generative & Multimodal AI
 
 Image, video and audio generation, vision-language models, and multimodal RAG.
 Text LLMs are in [09-nlp-and-llms.md](09-nlp-and-llms.md); basic generative model types (VAE, GAN) are in [08 §6](08-deep-learning.md#6-generative-models).
@@ -45,21 +45,21 @@ Text LLMs are in [09-nlp-and-llms.md](09-nlp-and-llms.md); basic generative mode
 
 **Q: Noise schedule?** How much noise is added at each step (linear, cosine). It affects quality, especially at high resolution.
 
-**Q: Which architecture?** Originally a **U-Net** with attention layers. Newer models use **Diffusion Transformers (DiT)** — treat latent patches as tokens — which scale better.
+**Q: Which architecture?** Originally a **U-Net** with attention layers. Newer models use **Diffusion Transformers (DiT)**, which treat latent patches as tokens and scale better.
 
 **Q: How is text used (conditioning)?** A text encoder (CLIP text encoder, T5) turns the prompt into embeddings; the denoiser attends to them through **cross-attention**.
 
 **Q: Classifier-free guidance (CFG)?** Train the model sometimes with the prompt and sometimes without (empty prompt). At sampling, push the prediction away from the unconditional one:
 `ε = ε_uncond + w · (ε_cond − ε_uncond)`.
-Higher guidance scale w → follows prompt more closely but less diverse and can look over-saturated. Typical w ≈ 5–8.
+Higher guidance scale w → follows prompt more closely but less diverse and can look over-saturated. Typical w ≈ 5-8.
 
 **Q: Negative prompts?** Replace the empty prompt in CFG with things to avoid ("blurry, extra fingers").
 
-**Q: Samplers (schedulers)?** DDPM (many steps, slow), DDIM (deterministic, fewer steps), DPM-Solver / Euler (good quality in 20–30 steps). Same model, different speed/quality trade-off.
+**Q: Samplers (schedulers)?** DDPM (many steps, slow), DDIM (deterministic, fewer steps), DPM-Solver / Euler (good quality in 20-30 steps). Same model, different speed/quality trade-off.
 
 **Q: Latent diffusion (Stable Diffusion idea)?** Run diffusion in the small latent space of a VAE instead of pixel space (e.g., 64×64×4 instead of 512×512×3) → ~50× cheaper. VAE decoder turns the final latent into the image.
 
-**Q: How to make sampling faster?** Fewer steps with better samplers, **distillation** (consistency models, progressive/adversarial distillation → 1–4 steps), smaller models, caching, fp16/quantization, TensorRT compilation.
+**Q: How to make sampling faster?** Fewer steps with better samplers, **distillation** (consistency models, progressive/adversarial distillation → 1-4 steps), smaller models, caching, fp16/quantization, TensorRT compilation.
 
 **Q: Why are hands and text inside images often wrong?** Small, detailed structures with many valid configurations and less training data; VAE compression loses fine details; text rendering needs exact characters. Newer models with better text encoders and higher-resolution latents improve it.
 
@@ -71,12 +71,12 @@ Higher guidance scale w → follows prompt more closely but less diverse and can
 | **Inpainting / outpainting** | regenerate a masked region / extend the canvas |
 | **ControlNet** | extra network that conditions on structure: edges, depth map, pose skeleton, segmentation |
 | **IP-Adapter / image prompts** | use a reference image as a style or subject prompt |
-| **LoRA for diffusion** | small low-rank adapters trained on 10–100 images to learn a style or object; swap per user |
+| **LoRA for diffusion** | small low-rank adapters trained on 10-100 images to learn a style or object; swap per user |
 | **DreamBooth** | fine-tune to bind a rare token to a specific subject ("sks dog") |
 | **Textual inversion** | learn a new word embedding for a concept, model frozen |
 | **Super-resolution / upscalers** | generate small, then upscale |
 
-**Q: Fine-tuning risks for diffusion?** Overfitting (every image looks like the training images), language drift (forgets what "dog" means generally) — fix with prior-preservation loss, fewer steps, lower LR, LoRA instead of full fine-tune.
+**Q: Fine-tuning risks for diffusion?** Overfitting (every image looks like the training images), language drift (forgets what "dog" means in general). Fix with prior-preservation loss, fewer steps, lower LR, LoRA instead of full fine-tune.
 
 **Q: Brand consistency for a company?** Brand LoRA trained on approved assets + reference image adapters + fixed prompt templates + brand-safety classifier + human approval for public use.
 
@@ -94,7 +94,7 @@ Higher guidance scale w → follows prompt more closely but less diverse and can
 
 ## 5. Vision-language models (VLMs)
 
-**Q: CLIP?** Image encoder + text encoder trained with **contrastive loss** on hundreds of millions of image–caption pairs. Matching pairs are pulled together. Gives zero-shot classification ("a photo of a {label}") and image–text search. Weak at counting, spatial relations, reading text.
+**Q: CLIP?** Image encoder + text encoder trained with **contrastive loss** on hundreds of millions of image-caption pairs. Matching pairs are pulled together. Gives zero-shot classification ("a photo of a {label}") and image-text search. Weak at counting, spatial relations, reading text.
 
 **Q: How do LLaVA-style multimodal LLMs work?**
 ```
@@ -102,11 +102,11 @@ Image → vision encoder (e.g., CLIP/SigLIP ViT) → patch embeddings
       → projector (MLP) maps them into the LLM's token space
       → LLM reads [image tokens] + [text tokens] → generates answer
 ```
-Training: (1) align the projector on image–caption pairs, (2) instruction tune on visual Q&A / conversations.
+Training: (1) align the projector on image-caption pairs, (2) instruction tune on visual Q&A / conversations.
 
 **Q: Other designs?** Cross-attention from LLM to image features (Flamingo-style), Q-Former to compress image features (BLIP-2), natively multimodal models trained on interleaved image-text from the start.
 
-**Q: Why do VLMs struggle with documents, charts and small text?** Image is resized to a low resolution (e.g., 336×336) → small text becomes unreadable. Fixes: high-resolution tiling ("any resolution" — split into crops + a global view), OCR-free document models trained on documents, or combine with OCR output.
+**Q: Why do VLMs struggle with documents, charts and small text?** Image is resized to a low resolution (e.g., 336×336) → small text becomes unreadable. Fixes: high-resolution tiling ("any resolution": split into crops + a global view), OCR-free document models trained on documents, or combine with OCR output.
 
 **Q: Image token cost?** A high-res image can be hundreds to thousands of tokens → latency and cost. Downscale when detail isn't needed; crop to the relevant region.
 
@@ -150,7 +150,7 @@ Normal RAG pipeline and its failures: [02 §7](02-ml-and-llm-systems.md#7-llm-sy
 **Q: Why is image generation expensive?** Each image = N denoising steps × a large network; video multiplies by frames. A GPU might produce a few to tens of images per second depending on model, resolution and steps.
 
 **Cost/latency levers:**
-- Fewer steps (better samplers, distilled 1–4 step models).
+- Fewer steps (better samplers, distilled 1-4 step models).
 - Lower default resolution + upscaler only when the user wants to download.
 - Batch requests on the GPU; queue with priority tiers (paid users first).
 - fp16/bf16, quantization, compiled engines.
@@ -168,11 +168,11 @@ Normal RAG pipeline and its failures: [02 §7](02-ml-and-llm-systems.md#7-llm-sy
 - **Input**: prompt classifiers, block lists for real-person names in sensitive contexts, policy-trained LLM filter.
 - **Output**: image safety classifiers (nudity, violence, minors), face matching against protected persons where legally appropriate, logo detection.
 - **Training data**: filter unsafe and opt-out content, licensed datasets, record data provenance.
-- **Provenance**: invisible **watermarks** and signed **content credentials** (C2PA-style metadata) so generated media can be identified. Note: metadata can be stripped; watermarks can be weakened by editing — use both, never rely on one.
+- **Provenance**: invisible **watermarks** and signed **content credentials** (C2PA-style metadata) so generated media can be identified. Note: metadata can be stripped; watermarks can be weakened by editing. Use both and never rely on just one.
 - **Voice**: consent verification for voice cloning, audio watermarking.
 - **Human review and appeals** for borderline cases; abuse monitoring per account.
 
-**Q: Copyright questions in interviews?** Say: training data licensing and opt-outs, avoid generating near-copies (memorization checks — compare outputs to training set with perceptual hashes), block specific protected characters/brands, legal review. Don't claim legal certainty.
+**Q: Copyright questions in interviews?** Say: training data licensing and opt-outs, avoid generating near-copies (memorization checks: compare outputs to training set with perceptual hashes), block specific protected characters/brands, legal review. Don't claim legal certainty.
 
 ## 10. System design: an image generation product
 
@@ -210,7 +210,7 @@ Low resolution of the face region in latent space, too few steps, aggressive dis
 **Prevent:** document/chart eval set with numeric exact-match checks.
 
 ### Image generation is too slow (12 s per image) and too expensive.
-Trace: queue time vs GPU time. Fix: distilled few-step model, fewer steps, lower default resolution + optional upscale, batching, fp16 + compiled engine, autoscale on queue length, cache popular templates, previews first. Trade-off: quality — measure with human preference on a fixed prompt set.
+Trace: queue time vs GPU time. Fix: distilled few-step model, fewer steps, lower default resolution + optional upscale, batching, fp16 + compiled engine, autoscale on queue length, cache popular templates, previews first. Trade-off: quality. Measure it with human preference on a fixed prompt set.
 
 ### Outputs are brand-unsafe or off-brand (wrong colors, competitor logos).
 Brand LoRA + reference-image conditioning, color palette constraints, logo/brand classifiers on output, prompt templates locked for non-expert users, human approval before publishing. Track off-brand rate from reviewer rejections.

@@ -1,4 +1,4 @@
-# 22 — AI Agents
+# 22. AI Agents
 
 Agents are LLM systems that **take actions**: call tools, browse, write and run code, update records.
 Interviews now ask how to design, evaluate and secure them. Basics are in [02 §9](02-ml-and-llm-systems.md#9-agents--tool-use); the support-agent case study is [05 #2](05-case-studies.md#2-customer-support-ai-agent).
@@ -28,7 +28,7 @@ goal → [LLM decides] → tool call → result → [LLM decides] → ... → fi
 
 **Q: Chatbot vs RAG vs agent?** Chatbot: answers from its own knowledge. RAG: retrieves documents then answers (fixed pipeline). Agent: decides **itself** which steps and tools to use, can take actions with side effects.
 
-**Q: When should you NOT use an agent?** When the steps are known and fixed — use a deterministic workflow (cheaper, faster, testable). Agents add cost, latency and unpredictability. Good rule: *"Use the simplest thing that works: single LLM call → fixed workflow → agent."*
+**Q: When should you NOT use an agent?** When the steps are known and fixed. Use a deterministic workflow (cheaper, faster, testable). Agents add cost, latency and unpredictability. Good rule: *"Use the simplest thing that works: single LLM call → fixed workflow → agent."*
 
 **Q: Main parts of an agent?** Model, instructions (system prompt), tools, memory/state, control loop with limits, guardrails, and observability.
 
@@ -48,7 +48,7 @@ goal → [LLM decides] → tool call → result → [LLM decides] → ... → fi
 
 **Q: Parallel tool calls?** Models can request several independent calls at once (e.g., fetch weather for 3 cities) → run them concurrently to cut latency.
 
-**Q: Who enforces permissions — the model or the tool?** Always the **tool/backend**. The model can be tricked; authorization must live in code (user's identity and scopes are passed by the system, not chosen by the model).
+**Q: Who enforces permissions, the model or the tool?** Always the **tool/backend**. The model can be tricked; authorization must live in code (user's identity and scopes are passed by the system, not chosen by the model).
 
 **Q: Structured output vs tool calls?** Structured output = model returns data in a schema. Tool calls = model asks the system to do something. Same mechanism under the hood in many APIs.
 
@@ -64,7 +64,7 @@ goal → [LLM decides] → tool call → result → [LLM decides] → ... → fi
 | **Routing** | classifier/LLM sends request to the right specialist flow | many task types |
 | **Reasoning models** | model "thinks" longer before answering | complex planning; higher latency/cost |
 
-**Q: How do coding agents verify their work?** Run tests, linters, type checks; read the error; fix; repeat. **Executable feedback is the strongest verifier** — prefer tasks/tools where results can be checked by code.
+**Q: How do coding agents verify their work?** Run tests, linters, type checks; read the error; fix; repeat. **Executable feedback is the best verifier**, so prefer tasks/tools where results can be checked by code.
 
 ## 4. Memory
 
@@ -83,14 +83,14 @@ goal → [LLM decides] → tool call → result → [LLM decides] → ... → fi
 ## 5. Multi-agent systems
 
 **Q: Common multi-agent patterns?**
-- **Orchestrator–workers (supervisor):** a lead agent splits the task and delegates to sub-agents, then combines results. Good for research/search that can run in parallel.
+- **Orchestrator-workers (supervisor):** a lead agent splits the task and delegates to sub-agents, then combines results. Good for research/search that can run in parallel.
 - **Pipeline / assembly line:** fixed sequence of specialist agents (extract → validate → write).
 - **Debate / critic:** one agent proposes, another critiques.
 - **Handoffs:** conversation is transferred to a specialist agent (billing agent, tech agent).
 
 **Q: Pros and cons?** Pros: parallelism, separation of concerns, fresh context per sub-task, specialized prompts/tools. Cons: more cost (often several times the tokens), coordination errors, duplicated work, contradictions, harder debugging.
 
-**Q: When is multi-agent worth it?** Broad tasks that split into **independent** parallel parts (researching 10 companies). Not worth it for tightly coupled tasks where every step depends on the last (most coding edits) — a single agent with good tools usually wins.
+**Q: When is multi-agent worth it?** Broad tasks that split into **independent** parallel parts (researching 10 companies). Not worth it for tightly coupled tasks where every step depends on the last (most coding edits). A single agent with good tools usually does better.
 
 **Q: How do sub-agents share information?** Clear task spec in, short structured result out; shared artifacts (files, DB records) instead of passing huge text; the orchestrator owns the final decision.
 
@@ -119,7 +119,7 @@ Most production systems are **hybrids**: a state machine with a few agentic step
 
 **Q: Agent-to-agent communication?** Emerging protocols let agents from different systems delegate tasks to each other. Same principles: authentication, scoped permissions, audit logs, untrusted inputs.
 
-**Q: Computer-use / browser agents?** The model sees screenshots (or the page's accessibility tree) and outputs clicks and keystrokes. Powerful for apps without APIs, but slow, brittle, and risky — prefer APIs where available; sandbox the browser; require confirmation for purchases or sends.
+**Q: Computer-use / browser agents?** The model sees screenshots (or the page's accessibility tree) and outputs clicks and keystrokes. Useful for apps without APIs, but slow, brittle, and risky. Prefer APIs where available; sandbox the browser; require confirmation for purchases or sends.
 
 ## 8. Safety: human-in-the-loop, sandboxing, permissions
 
@@ -151,7 +151,7 @@ Most production systems are **hybrids**: a state machine with a few agentic step
 | Trajectory | right tools chosen, no unnecessary or unsafe calls, number of steps |
 | Efficiency | tokens, cost, wall-clock time per task |
 | Safety | rate of policy violations, unsafe actions attempted, injection success rate |
-| Reliability | **pass^k** — succeeds in all k repeated runs (users need consistency, not lucky runs) |
+| Reliability | **pass^k**: succeeds in all k repeated runs (users need consistency, not lucky runs) |
 | User | resolution rate, escalation rate, satisfaction, undo rate |
 
 **Q: How to build an agent eval set?** Real tasks from logs (anonymized) + hand-written edge cases + adversarial cases; each with a **checkable end state**; run in a sandboxed environment with mocked or replayable APIs; run each task several times; track results per model/prompt version in CI.
@@ -160,7 +160,7 @@ Most production systems are **hybrids**: a state machine with a few agentic step
 
 ## 10. Observability and operations
 
-- **Trace every step:** prompt, model version, tool name + arguments + result, latency, tokens, cost, errors — linked by a trace ID per task.
+- **Trace every step:** prompt, model version, tool name + arguments + result, latency, tokens, cost, errors, all linked by a trace ID per task.
 - **Dashboards:** success rate, steps per task, cost per task, tool error rates, human-approval rate, top failure reasons.
 - **Replay:** re-run a failed trace with a new prompt/model to test fixes.
 - **Budgets and alerts:** per-user and per-task spend caps; alert on loops and cost spikes.
@@ -185,7 +185,7 @@ Clients (chat, Slack, API, scheduled jobs)
    → Observability: traces, cost metering per team, audit log (immutable)
    → Eval service: run suites on every agent/prompt/model change; canary + rollback
 ```
-**Deep dives to offer:** isolation between tenants, credential management (agents never see raw secrets — tools hold them), durable execution for multi-hour tasks, cost control, approval UX (show exactly what will happen), and how you evaluate before rollout.
+**Deep dives to offer:** isolation between tenants, credential management (agents never see raw secrets; the tools hold them), durable execution for multi-hour tasks, cost control, approval UX (show exactly what will happen), and how you evaluate before rollout.
 
 ---
 
@@ -200,7 +200,7 @@ Already covered in 04: [prompt injection (#15)](04-what-if-scenarios.md#15-promp
 **Long-term:** router step that narrows tools per intent; hierarchical tool groups; fine-tune on correct trajectories.
 **Prevent:** tool-selection accuracy in the eval suite.
 
-### The agent claims it did something it didn't ("I've updated your address") — hallucinated tool result.
+### The agent claims it did something it didn't ("I've updated your address"): hallucinated tool result.
 **Causes:** tool call failed or was never made, but the model continued; error returned as text the model ignored; model trained to sound helpful.
 **Isolate:** compare final message with the actual tool-call log and system state.
 **Fix:** final answer generated from **verified state** (re-read the record), structured success/failure flags from tools, a verifier step before claiming success, UI shows actual action receipts.
@@ -235,4 +235,4 @@ Test tasks too clean; production tools return errors, timeouts and odd data; rea
 Indirect prompt injection. Treat tool outputs as data, keep sensitive actions behind approval, block outbound data flows to unknown destinations, strip or flag instruction-like content, and break the "lethal trifecta" (§8).
 
 ### Users don't trust the agent and approve everything without reading.
-Approval fatigue. Reduce approvals to truly risky actions, show clear diffs/previews and the reason, batch approvals, measure approval time and reversal rate.
+Approval fatigue. Only ask for approval on actions that are actually risky, show clear diffs/previews and the reason, batch approvals, measure approval time and reversal rate.

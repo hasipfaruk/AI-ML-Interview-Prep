@@ -1,4 +1,4 @@
-# 09 — NLP & LLMs (Theory + Scenarios)
+# 09. NLP & LLMs (Theory + Scenarios)
 
 ### Contents
 1. [Classic NLP](#1-classic-nlp)
@@ -16,13 +16,13 @@
 
 ## 1. Classic NLP
 
-**Q: Text preprocessing steps?** Lowercasing, tokenization, removing punctuation/stopwords, stemming (crude chop: "running"→"run") vs lemmatization (dictionary form: "better"→"good"), normalization. *Note:* for Transformers you mostly skip this — use the model's own tokenizer on raw text.
+**Q: Text preprocessing steps?** Lowercasing, tokenization, removing punctuation/stopwords, stemming (crude chop: "running"→"run") vs lemmatization (dictionary form: "better"→"good"), normalization. *Note:* for Transformers you mostly skip this and use the model's own tokenizer on raw text.
 
 **Q: Bag of Words vs TF-IDF?** BoW counts words. TF-IDF = term frequency × inverse document frequency → down-weights common words. Both ignore word order and meaning.
 
 **Q: BM25?** Improved TF-IDF ranking function (term frequency saturation + document length normalization). Still the strong baseline for keyword search.
 
-**Q: n-grams?** Sequences of n words — capture some local order ("not good").
+**Q: n-grams?** Sequences of n words. They capture some local order ("not good").
 
 **Q: Classic NLP tasks?** Text classification, sentiment, NER (named entity recognition), POS tagging, parsing, machine translation, summarization (extractive vs abstractive), question answering, topic modeling (LDA), coreference resolution.
 
@@ -48,7 +48,7 @@
 
 **Q: Static vs contextual embeddings?** Static: one vector per word ("bank" same everywhere). Contextual (BERT, etc.): vector depends on the sentence.
 
-**Q: Sentence embeddings?** Models trained with **contrastive learning** (pull similar pairs together, push others apart) — Sentence-BERT, E5, BGE, OpenAI/Cohere embeddings. Used for semantic search, clustering, RAG.
+**Q: Sentence embeddings?** Models trained with **contrastive learning** (pull similar pairs together, push others apart). Examples: Sentence-BERT, E5, BGE, OpenAI/Cohere embeddings. Used for semantic search, clustering, RAG.
 
 **Q: Bi-encoder vs cross-encoder?** Bi-encoder encodes query and document separately → precompute document vectors → fast retrieval. Cross-encoder reads query + document together → more accurate, slow → used for **reranking** top results.
 
@@ -78,11 +78,11 @@
 ## 5. How LLMs are trained
 
 ```
-1. Pretraining      — next-token prediction on trillions of tokens (web, books, code). Learns language + knowledge.
-2. SFT (instruction tuning) — fine-tune on (instruction, good response) pairs. Learns to follow instructions/chat format.
-3. Preference alignment     — RLHF (reward model + PPO) or DPO (direct preference optimization) on (chosen, rejected) pairs.
-                              Learns helpful, harmless, honest behavior.
-(+ reasoning training with RL on verifiable rewards — math/code — for "thinking" models)
+1. Pretraining:              next-token prediction on trillions of tokens (web, books, code). Learns language + knowledge.
+2. SFT (instruction tuning): fine-tune on (instruction, good response) pairs. Learns to follow instructions/chat format.
+3. Preference alignment:     RLHF (reward model + PPO) or DPO (direct preference optimization) on (chosen, rejected) pairs.
+                             Learns helpful, harmless, honest behavior.
+(+ reasoning training with RL on verifiable rewards, like math and code, for "thinking" models)
 ```
 **Q: RLHF in simple words?** Humans compare two answers → train a reward model to predict preference → optimize the LLM with RL (PPO) to maximize reward, with a KL penalty to stay close to the original model (avoid reward hacking).
 
@@ -97,8 +97,8 @@
 **Q: Decoding strategies?**
 | Method | Behavior |
 |---|---|
-| Greedy | Always pick top token — deterministic, can be repetitive |
-| Beam search | Keep top-k sequences — good for translation, bland for chat |
+| Greedy | Always pick top token. Deterministic, can be repetitive |
+| Beam search | Keep top-k sequences. Good for translation, bland for chat |
 | Temperature | <1 sharper (more deterministic), >1 more random |
 | Top-k | sample from k most likely tokens |
 | Top-p (nucleus) | sample from smallest set with cumulative prob ≥ p |
@@ -108,7 +108,7 @@
 
 **Q: Fine-tuning methods?**
 - **Full fine-tuning:** all weights; expensive, risk of forgetting.
-- **PEFT:** LoRA (low-rank adapters on attention/MLP weights — trains <1% params), **QLoRA** (LoRA on 4-bit quantized base → fine-tune big models on one GPU), prefix/prompt tuning, adapters.
+- **PEFT:** LoRA (low-rank adapters on attention/MLP weights; trains <1% of params), **QLoRA** (LoRA on 4-bit quantized base → fine-tune big models on one GPU), prefix/prompt tuning, adapters.
 - **Q: How does LoRA work?** Freeze W; learn ΔW = B·A with small rank r. At inference merge or swap adapters. Hyperparameters: rank r, alpha, target modules, LR.
 
 **Q: When fine-tune vs RAG vs prompt?** See [02 §12](02-ml-and-llm-systems.md#12-decision-tables). One-liner: *"RAG for knowledge, fine-tuning for behavior/format/cost, prompting first always."*
@@ -124,9 +124,9 @@
 **Q: Other limitations?** Knowledge cutoff, context limits, lost-in-the-middle, sensitivity to prompt wording, weak arithmetic without tools, bias, prompt injection, cost/latency, non-determinism.
 
 **Q: How to evaluate LLMs?**
-- Benchmarks (MMLU, GSM8K, HumanEval…) — general capability, beware contamination.
-- **Task-specific eval set** from real use — the most important.
-- Metrics: exact match / F1 (QA), BLEU/ROUGE (translation/summarization — weak correlation with quality), BERTScore, pass@k (code), LLM-as-judge with rubrics, human eval, pairwise preference (win rate).
+- Benchmarks (MMLU, GSM8K, HumanEval…) for general capability. Watch out for contamination (test data leaked into training).
+- **Task-specific eval set** built from real use. This matters most.
+- Metrics: exact match / F1 (QA), BLEU/ROUGE (translation/summarization; they correlate weakly with quality), BERTScore, pass@k (code), LLM-as-judge with rubrics, human eval, pairwise preference (win rate).
 - Safety/red-teaming, consistency, latency, cost.
 
 ## 8. What-if scenarios
@@ -138,7 +138,7 @@ Data mismatch. Collect & label code-mixed samples, use multilingual model (XLM-R
 BoW/TF-IDF models ignore order → use contextual models (fine-tuned Transformer); add targeted training examples; error analysis with slices (negation, sarcasm).
 
 ### Fine-tuned LLM outputs repeat the same phrase endlessly.
-Decoding: add repetition penalty, adjust temperature/top-p, set max tokens, stop sequences. Training: check EOS token included in training data (common bug — model never learned to stop!), data has duplicates, chat template mismatch.
+Decoding: add repetition penalty, adjust temperature/top-p, set max tokens, stop sequences. Training: check EOS token included in training data (a common bug: the model never learned to stop), data has duplicates, chat template mismatch.
 
 ### Fine-tuned model ignores the instruction format after training.
 **Chat template mismatch** between training and inference (system/user/assistant tags), loss computed on prompt tokens instead of only response tokens, too few epochs or LR too low.

@@ -1,4 +1,4 @@
-# 04 — 50 "What If…?" Scenarios with Model Answers
+# 04. 50 "What If…?" Scenarios with Model Answers
 
 Every answer follows the framework from [03-debugging-framework.md](03-debugging-framework.md):
 **Causes (ranked) → How to isolate → Fix (now / long-term) → Prevent.**
@@ -6,19 +6,19 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **How to practice:** read only the question, cover the rest, speak for 3 minutes, then compare. Mark the ones you missed and redo them 2 days later.
 
 ### Contents
-- [A. RAG systems (1–12)](#a-rag-systems)
-- [B. LLM apps & agents (13–22)](#b-llm-apps--agents)
-- [C. ML models in production (23–32)](#c-ml-models-in-production)
-- [D. Data & pipelines (33–38)](#d-data--pipelines)
-- [E. Serving, infra & scale (39–46)](#e-serving-infra--scale)
-- [F. Recommenders, search & ranking (47–50)](#f-recommenders-search--ranking)
+- [A. RAG systems (1-12)](#a-rag-systems)
+- [B. LLM apps & agents (13-22)](#b-llm-apps--agents)
+- [C. ML models in production (23-32)](#c-ml-models-in-production)
+- [D. Data & pipelines (33-38)](#d-data--pipelines)
+- [E. Serving, infra & scale (39-46)](#e-serving-infra--scale)
+- [F. Recommenders, search & ranking (47-50)](#f-recommenders-search--ranking)
 
 ---
 
 ## A. RAG systems
 
 ### 1. Same question, different answers for different users (or on retry)
-*Full worked answer in [03-debugging-framework.md](03-debugging-framework.md#full-worked-example--the-question-you-were-asked).*
+*Full worked answer in [03-debugging-framework.md](03-debugging-framework.md#full-worked-example-the-question-you-were-asked).*
 **Short version:** temperature/sampling → per-user prompt differences (history, ACLs) → non-deterministic retrieval (ANN, ties, query rewrite) → version skew (index/model/prompt) → conflicting docs → cache.
 **Isolate:** replay N times, log chunk IDs + prompt hash + model version. Same chunks + different answers = generation. Different chunks = retrieval.
 **Fix:** temp 0 + pinned model, deterministic tie-breaks, versioned index with atomic swap, dedupe conflicting docs, version in cache key.
@@ -26,15 +26,15 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 
 ### 2. RAG says "I don't know" even though the answer is in the documents
 **Causes (ranked):**
-1. Document never indexed properly — PDF parse failure, scanned image without OCR, table flattened into garbage.
+1. Document never indexed properly: PDF parse failure, scanned image without OCR, table flattened into garbage.
 2. Chunking split the answer across chunks, or chunk too big so the embedding is diluted.
-3. Vocabulary mismatch — user says "PTO", doc says "paid leave". Pure vector search misses exact terms, codes, IDs.
+3. Vocabulary mismatch. User says "PTO", doc says "paid leave". Pure vector search misses exact terms, codes, IDs.
 4. Similarity threshold too strict / top-k too small.
 5. Metadata filter wrong (wrong tenant, date filter, ACL).
 6. Answer retrieved but ranked low → cut off by reranker or context budget.
 7. Prompt too strict ("only answer if 100% sure").
 
-**Isolate:** search the vector DB directly for the doc → is it there? Inspect the chunk text. Run the query and print top-50 with scores — where does the right chunk rank? If not in top-50 → embedding/chunking. In top-50 but not top-5 → reranking/k.
+**Isolate:** search the vector DB directly for the doc → is it there? Inspect the chunk text. Run the query and print top-50 with scores. Where does the right chunk rank? If not in top-50 → embedding/chunking. In top-50 but not top-5 → reranking/k.
 **Fix:** better parser/OCR, chunk with overlap & respect headings, **hybrid search (BM25 + vector)**, query expansion/rewrite, raise k then rerank, tune threshold on labeled set.
 **Prevent:** retrieval eval set with **recall@k**, ingestion validation (empty-chunk checks, parse-success rate).
 
@@ -51,12 +51,12 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **Prevent:** freshness SLO ("95% of doc updates searchable in < 15 min"), alert on ingestion lag.
 
 ### 5. Retrieval quality dropped after switching embedding model
-**Cause:** almost always — **query embedded with new model, documents still embedded with old model** (different vector spaces) or partially re-embedded index. Also: different normalization (cosine vs dot product), different max token length truncating chunks.
+**Cause:** almost always, **query embedded with new model, documents still embedded with old model** (different vector spaces) or partially re-embedded index. Also: different normalization (cosine vs dot product), different max token length truncating chunks.
 **Fix:** re-embed entire corpus into a **new index**, test offline, then swap atomically. Never mix models in one index. Store `embedding_model_version` as index metadata and assert at query time.
 **Prevent:** retrieval eval gate before swap.
 
 ### 6. RAG is too slow (p95 = 8 s)
-**Isolate first:** trace per stage. Typical budget: embed 20 ms, retrieve 30–100 ms, rerank 100–300 ms, LLM first token 300–800 ms, full generation 1–5 s.
+**Isolate first:** trace per stage. Typical budget: embed 20 ms, retrieve 30-100 ms, rerank 100-300 ms, LLM first token 300-800 ms, full generation 1-5 s.
 **Fixes by stage:**
 - LLM: **stream tokens** (perceived latency), smaller/faster model for simple queries (routing), shorter context, limit output tokens, prompt caching, speculative decoding/self-hosted vLLM.
 - Retrieval: ANN index (HNSW) tuning, fewer filters post-hoc, colocate DB.
@@ -64,10 +64,10 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 - Query rewrite: skip it for short clear queries, or run in parallel.
 - Cache: exact-match + **semantic cache** for frequent questions.
 - Parallelize independent calls (retrieve from 2 sources concurrently).
-**Trade-off:** latency vs quality — measure quality impact of each cut on eval set.
+**Trade-off:** latency vs quality. Measure quality impact of each cut on eval set.
 
 ### 7. Users see documents they shouldn't have access to
-**Severity: security incident** — say so. Mitigate immediately (disable feature or restrict to safe corpus).
+**Severity:** this is a security incident, so say that out loud. Mitigate immediately (disable feature or restrict to safe corpus).
 **Causes:** ACL filtering done *after* retrieval in the app (bug) or not at all; ACL metadata stale (permission revoked but index not updated); shared cache across users returns another user's answer; prompt injection asking to "show all docs".
 **Fix:** enforce **pre-retrieval filtering** in the vector DB with tenant/group IDs; per-tenant namespaces/indexes for strong isolation; cache key includes user/permission scope; sync ACL changes on events.
 **Prevent:** automated tests "user A queries doc B → must not appear", audit logs.
@@ -78,7 +78,7 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **Prevent:** continuous eval on sampled production traffic.
 
 ### 9. Answer quality is fine for short docs, bad for long docs (100+ page manuals)
-**Causes:** fixed-size chunks lose structure; tables/sections split; "lost in the middle" — LLMs ignore middle of long context.
+**Causes:** fixed-size chunks lose structure; tables/sections split; "lost in the middle" (LLMs ignore middle of long context).
 **Fix:** structure-aware chunking (by headings), parent-child retrieval (retrieve small chunk, give parent section), add doc title/section path to each chunk, summarise sections, put most relevant chunks at start/end of context.
 
 ### 10. Multi-hop questions fail ("Which manager approved the project that had the biggest budget?")
@@ -129,7 +129,7 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 
 ### 19. How do you know your LLM feature is actually good? (evaluation)
 **Answer layers:** (1) offline golden set with references → exact-match/semantic similarity, LLM-as-judge with rubric (calibrated against human labels), (2) RAG-specific: context recall/precision, faithfulness, answer relevance, (3) online: thumbs up/down, resolution rate, escalation-to-human rate, A/B tests, (4) safety: red-team set, toxicity, PII leakage.
-**Gotcha:** LLM judges are biased (position, verbosity, self-preference) → randomize order, validate against humans.
+**Watch out:** LLM judges are biased (position, verbosity, self-preference) → randomize order, validate against humans.
 
 ### 20. Outputs contain PII (emails, phone numbers) of other customers
 **Mitigate:** output PII filter now. **Root causes:** PII in indexed docs, or in fine-tuning data (model memorized it), or shared cache/memory across users.
@@ -148,11 +148,11 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 
 ### 23. Model accuracy was 95% offline but 70% in production
 **Causes (ranked):**
-1. **Train/serve skew** — features computed differently online vs offline (different code, units, defaults for nulls, timezones).
-2. **Data leakage** in training — a feature that wouldn't be available at prediction time (e.g., "refund_issued" when predicting fraud). Offline score was fake.
-3. **Distribution shift** — production population differs from training data.
-4. Wrong split — random split on time-series data (future leaked into training).
-5. Preprocessing mismatch — different tokenizer/scaler version, label encoding order.
+1. **Train/serve skew**: features computed differently online vs offline (different code, units, defaults for nulls, timezones).
+2. **Data leakage** in training: a feature that wouldn't be available at prediction time (e.g., "refund_issued" when predicting fraud). Offline score was fake.
+3. **Distribution shift**: production population differs from training data.
+4. Wrong split: random split on time-series data (future leaked into training).
+5. Preprocessing mismatch: different tokenizer/scaler version, label encoding order.
 **Isolate:** log production features → recompute the same rows offline → compare feature-by-feature. Check feature importance for suspiciously strong features.
 **Fix:** single feature definition shared by training & serving (**feature store**), time-based splits, point-in-time correct joins.
 **Prevent:** skew monitoring, shadow deployment before launch.
@@ -169,14 +169,14 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **Prevent:** input validation, alerts on prediction distribution, canary deploys.
 
 ### 26. Labels arrive 30 days late (e.g., loan default, chargebacks). How do you monitor?
-**Answer:** use proxy signals until labels arrive — input drift, prediction drift, early indicators (first payment missed), human-reviewed sample. Then backfill real performance when labels land.
+**Answer:** use proxy signals until labels arrive: input drift, prediction drift, early indicators (first payment missed), human-reviewed sample. Then backfill real performance when labels land.
 
 ### 27. Fraud model: 99.9% accuracy but catches no fraud
-**Cause:** class imbalance — predicting "not fraud" always is 99.9% accurate.
+**Cause:** class imbalance. Predicting "not fraud" always is 99.9% accurate.
 **Fix:** use precision/recall, PR-AUC, recall at fixed false positive rate; class weights, resampling, threshold tuning based on business cost (cost of missed fraud vs. cost of blocking good user).
 
 ### 28. New model won the offline evaluation but lost the A/B test
-**Causes:** offline metric ≠ business metric; offline data biased by old model (it only saw items the old model showed — **selection bias / feedback loop**); latency increase hurt engagement; novelty effects; A/B test underpowered.
+**Causes:** offline metric ≠ business metric; offline data biased by old model (it only saw items the old model showed, which is **selection bias / feedback loop**); latency increase hurt engagement; novelty effects; A/B test underpowered.
 **Fix:** align offline metric to online goal, counterfactual/off-policy evaluation, check guardrail metrics (latency), run test longer/with power analysis.
 
 ### 29. Model is biased against a user group
@@ -187,7 +187,7 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **Fix:** **never auto-deploy without gates**: eval against current champion on fixed holdout + recent data, sanity checks (prediction distribution), canary with automatic rollback. Model registry with champion/challenger.
 
 ### 31. Can't reproduce last month's model
-**Need:** version everything — code (git), data snapshot (DVC/Delta/lakehouse time travel), features, hyperparameters, random seeds, library versions (Docker image), experiment tracking (MLflow/W&B).
+**Need:** version everything: code (git), data snapshot (DVC/Delta/lakehouse time travel), features, hyperparameters, random seeds, library versions (Docker image), experiment tracking (MLflow/W&B).
 
 ### 32. Model works in batch, but real-time version is different
 **Cause:** batch features use full-day aggregates; real-time uses partial windows; different code paths.
@@ -233,7 +233,7 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 **Cause:** mid-rollout with mixed versions, stale model file on one node, different hardware/library version, local cache.
 **Fix:** immutable versioned model artifacts, readiness checks that verify model hash, version in response header.
 
-### 43. Rolled out a new model, error rate jumped — what now?
+### 43. Rolled out a new model, error rate jumped: what now?
 **Answer:** rollback first (that's why we canary + keep previous version warm), then debug from logs offline. "Mitigate first, investigate second."
 
 ### 44. Vector DB is the bottleneck at 50M vectors
@@ -264,7 +264,7 @@ Every answer follows the framework from [03-debugging-framework.md](03-debugging
 
 ---
 
-## Final drill — 10 rapid-fire questions (answer in 30 seconds each)
+## Final drill: 10 rapid-fire questions (answer in 30 seconds each)
 
 1. Same chunks retrieved, different answers → *generation randomness / prompt diff*
 2. Different chunks retrieved for the same query → *ANN non-determinism, query rewrite, index version, filters*

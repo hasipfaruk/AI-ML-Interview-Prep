@@ -1,7 +1,7 @@
-# 16 — Reinforcement Learning & Bandits
+# 16. Reinforcement Learning & Bandits
 
 Asked in research, robotics, ads/recommendation, game AI, and LLM alignment (RLHF) interviews.
-Format: **Q → short answer you can say in 30–60 seconds.** "What if" scenarios at the end.
+Format: **Q → short answer you can say in 30-60 seconds.** "What if" scenarios at the end.
 
 ### Contents
 1. [Core ideas](#1-core-ideas)
@@ -19,7 +19,7 @@ Format: **Q → short answer you can say in 30–60 seconds.** "What if" scenari
 
 ## 1. Core ideas
 
-**Q: What is reinforcement learning?** An **agent** takes **actions** in an **environment**, observes a new **state** and a **reward**, and learns a **policy** (what to do in each state) that maximizes total future reward. No labeled "correct action" — only reward signals, often delayed.
+**Q: What is reinforcement learning?** An **agent** takes **actions** in an **environment**, observes a new **state** and a **reward**, and learns a **policy** (what to do in each state) that maximizes total future reward. There is no labeled "correct action". It only gets reward signals, and they are often delayed.
 
 **Q: How is RL different from supervised learning?** No correct labels, only rewards; rewards can be delayed (credit assignment problem); the agent's own actions change the data it sees (data is not i.i.d.); it must balance exploration and exploitation.
 
@@ -29,13 +29,13 @@ Format: **Q → short answer you can say in 30–60 seconds.** "What if" scenari
 
 **Q: What is the discount factor γ?** A number in [0, 1) that makes future rewards worth less. Return G = r₀ + γr₁ + γ²r₂ + … Small γ → short-sighted agent. γ close to 1 → long-term planning but higher variance and slower learning.
 
-**Q: Episodic vs continuing tasks?** Episodic tasks end (a game round). Continuing tasks never end (server cooling control) — need discounting or average-reward formulations.
+**Q: Episodic vs continuing tasks?** Episodic tasks end (a game round). Continuing tasks never end (server cooling control), so they need discounting or average-reward formulations.
 
-**Q: Policy — deterministic vs stochastic?** Deterministic: a = π(s). Stochastic: π(a|s) gives probabilities. Stochastic policies help exploration and are needed in some games (rock-paper-scissors).
+**Q: Deterministic vs stochastic policy?** Deterministic: a = π(s). Stochastic: π(a|s) gives probabilities. Stochastic policies help exploration and are needed in some games (rock-paper-scissors).
 
-**Q: On-policy vs off-policy?** On-policy learns from data collected by the current policy (SARSA, PPO) — stable, but can't reuse old data. Off-policy learns from data collected by any policy (Q-learning, DQN, SAC) — sample-efficient via replay buffers, but less stable.
+**Q: On-policy vs off-policy?** On-policy learns from data collected by the current policy (SARSA, PPO). It is stable, but can't reuse old data. Off-policy learns from data collected by any policy (Q-learning, DQN, SAC). It is sample-efficient thanks to replay buffers, but less stable.
 
-**Q: Model-free vs model-based?** Model-free learns values/policy directly from experience. Model-based learns (or is given) a model of the environment and plans with it — more sample-efficient, but model errors compound.
+**Q: Model-free vs model-based?** Model-free learns values/policy directly from experience. Model-based learns (or is given) a model of the environment and plans with it. This is more sample-efficient, but model errors add up.
 
 **Q: What is the credit assignment problem?** When a reward arrives late (win at the end of a chess game), which earlier actions caused it? Value functions, discounting, and advantage estimation help solve it.
 
@@ -49,7 +49,7 @@ Bellman **optimality**: `Q*(s,a) = E[ r + γ·max_a' Q*(s',a') ]`.
 
 **Q: Dynamic programming methods?** When the model is known: **policy iteration** (evaluate policy, then improve greedily, repeat) and **value iteration** (apply Bellman optimality update until convergence).
 
-**Q: Monte Carlo vs Temporal Difference (TD) learning?** MC waits until the episode ends and uses the full return — unbiased but high variance. TD updates after each step using the estimate of the next state (bootstrapping) — lower variance, some bias, works in continuing tasks. **TD(λ)** / n-step returns sit between.
+**Q: Monte Carlo vs Temporal Difference (TD) learning?** MC waits until the episode ends and uses the full return: unbiased, but high variance. TD updates after each step using the estimate of the next state (bootstrapping): lower variance, some bias, and it works in continuing tasks. **TD(λ)** / n-step returns sit between.
 
 **Q: What is bootstrapping in RL?** Updating an estimate using another estimate (V(s') in the TD target) instead of the real full return.
 
@@ -64,8 +64,8 @@ Off-policy: it learns the greedy policy while behaving with an exploratory one (
 **Q: Why can't we use a table for Atari?** Too many states (pixels). Use a neural network to approximate Q → **DQN**.
 
 **Q: DQN's two key tricks?**
-1. **Experience replay** — store transitions in a buffer, train on random mini-batches → breaks correlation between consecutive samples, reuses data.
-2. **Target network** — a slowly updated copy of the Q-network computes the TD target → stops the target from moving every step (stability).
+1. **Experience replay:** store transitions in a buffer and train on random mini-batches. This breaks correlation between consecutive samples, reuses data.
+2. **Target network:** a slowly updated copy of the Q-network computes the TD target, so the target doesn't move every step (more stable).
 
 **Q: The "deadly triad"?** Function approximation + bootstrapping + off-policy learning together can make training diverge. DQN tricks reduce (not remove) this risk.
 
@@ -84,17 +84,17 @@ Off-policy: it learns the greedy policy while behaving with an exploratory one (
 
 **Q: Actor-critic?** **Actor** = policy network (chooses actions). **Critic** = value network (estimates V or Q to compute advantage). Critic reduces variance for the actor. Examples: A2C/A3C, SAC, DDPG, TD3.
 
-**Q: What is GAE (Generalized Advantage Estimation)?** A weighted mix of n-step advantages controlled by λ — trades bias vs variance. Standard in PPO.
+**Q: What is GAE (Generalized Advantage Estimation)?** A weighted mix of n-step advantages controlled by λ. It trades bias against variance. Standard in PPO.
 
 **Q: Why are large policy updates dangerous?** One bad update can collapse the policy, and then the agent collects bad data and can't recover. **TRPO** limits updates with a KL constraint; **PPO** does it more simply.
 
-**Q: How does PPO work?** It clips the probability ratio `r = π_new(a|s) / π_old(a|s)` to `[1−ε, 1+ε]` (ε≈0.2) in the objective, so the policy can't move too far per update. Simple, stable, the default choice — and the algorithm classically used in RLHF.
+**Q: How does PPO work?** It clips the probability ratio `r = π_new(a|s) / π_old(a|s)` to `[1−ε, 1+ε]` (ε≈0.2) in the objective, so the policy can't move too far per update. It is simple and stable, the default choice, and the algorithm first used for RLHF.
 
-**Q: SAC (Soft Actor-Critic)?** Off-policy actor-critic for continuous control that maximizes reward **plus entropy** → explores well, very sample-efficient, robust. Popular in robotics.
+**Q: SAC (Soft Actor-Critic)?** Off-policy actor-critic for continuous control that maximizes reward **plus entropy** → explores well, very sample-efficient and stable. Popular in robotics.
 
 **Q: DDPG / TD3?** Deterministic actor-critic for continuous actions. TD3 fixes DDPG overestimation with twin critics, delayed actor updates, and target smoothing.
 
-**Q: Value-based vs policy-based — when to choose which?**
+**Q: Value-based vs policy-based: when to choose which?**
 | Situation | Prefer |
 |---|---|
 | Discrete actions, need sample efficiency | DQN family |
@@ -112,9 +112,9 @@ Off-policy: it learns the greedy policy while behaving with an exploratory one (
 - **Entropy bonus** (policy gradients, SAC)
 - **Optimism / UCB** (prefer uncertain actions)
 - **Thompson sampling** (sample from posterior)
-- **Intrinsic motivation / curiosity** (reward for novel states: count-based, RND, ICM) — for **sparse reward** problems.
+- **Intrinsic motivation / curiosity** (reward for novel states: count-based, RND, ICM), used for **sparse reward** problems.
 
-**Q: Sparse rewards — how to deal?** Reward shaping (carefully), curiosity bonuses, curriculum learning (easy → hard tasks), hindsight experience replay (treat reached states as goals), demonstrations (imitation learning to bootstrap).
+**Q: How do you deal with sparse rewards?** Reward shaping (carefully), curiosity bonuses, curriculum learning (easy → hard tasks), hindsight experience replay (treat reached states as goals), demonstrations (imitation learning to bootstrap).
 
 **Q: Danger of reward shaping?** The agent may optimize the shaped reward instead of the true goal. **Potential-based shaping** is guaranteed not to change the optimal policy.
 
@@ -122,25 +122,25 @@ Off-policy: it learns the greedy policy while behaving with an exploratory one (
 
 **Q: Model-based RL examples?** Dyna (learn model, generate simulated experience), MCTS planning (AlphaGo/AlphaZero: MCTS + policy/value networks), MuZero (learns a latent model), Dreamer (learn world model, train policy in imagination).
 
-**Q: Offline (batch) RL?** Learn a policy from a fixed logged dataset with no new interaction — important when exploration is dangerous or expensive (healthcare, finance, recommendations).
-**Main problem:** **distribution shift** — the policy picks actions not in the data, and Q-values for those are wrongly optimistic. Fixes: conservative methods (CQL), policy constraints (BCQ, BEAR, TD3+BC), IQL.
+**Q: Offline (batch) RL?** Learn a policy from a fixed logged dataset with no new interaction. This matters when exploration is dangerous or expensive (healthcare, finance, recommendations).
+**Main problem:** **distribution shift**. The policy picks actions that are not in the data, and Q-values for those are wrongly optimistic. Fixes: conservative methods (CQL), policy constraints (BCQ, BEAR, TD3+BC), IQL.
 
 **Q: Off-policy evaluation (OPE)?** Estimate how a new policy would perform using logged data from an old policy, before deploying. Methods: importance sampling (IPS), self-normalized IPS, direct method (model the reward), **doubly robust** (combines both). Requires logging action probabilities (propensities).
 
-**Q: Imitation learning?** Learn from expert demonstrations. **Behavioral cloning** = supervised learning on (state, expert action) — simple but errors compound when the agent drifts to unseen states. **DAgger** fixes this by asking the expert to label states the agent visits. **Inverse RL** learns the reward function from demonstrations.
+**Q: Imitation learning?** Learn from expert demonstrations. **Behavioral cloning** = supervised learning on (state, expert action). It is simple, but errors build up when the agent drifts to unseen states. **DAgger** fixes this by asking the expert to label states the agent visits. **Inverse RL** learns the reward function from demonstrations.
 
 ## 7. Multi-armed & contextual bandits
 
-**Q: What is a multi-armed bandit?** RL with a single state: choose among K arms (ads, headlines, prices) to maximize total reward. No state transitions — only the exploration/exploitation trade-off.
+**Q: What is a multi-armed bandit?** RL with a single state: choose among K arms (ads, headlines, prices) to maximize total reward. There are no state transitions, only the exploration/exploitation trade-off.
 
 **Q: What is regret?** Total reward lost compared to always pulling the best arm. Good algorithms have regret growing as O(log T) (sublinear).
 
 **Q: Main bandit algorithms?**
 | Algorithm | Idea |
 |---|---|
-| ε-greedy | random arm with prob ε — simple, wastes exploration on clearly bad arms |
-| UCB | pick arm with highest `mean + c·sqrt(log t / n_arm)` — optimism under uncertainty |
-| Thompson sampling | keep a posterior per arm (Beta for clicks), sample, pick the max — strong in practice |
+| ε-greedy | random arm with prob ε; simple, but wastes exploration on clearly bad arms |
+| UCB | pick arm with highest `mean + c·sqrt(log t / n_arm)` (optimism under uncertainty) |
+| Thompson sampling | keep a posterior per arm (Beta for clicks), sample, pick the max; works very well in practice |
 | Contextual (LinUCB, neural bandits) | reward depends on context (user features) |
 
 **Q: Bandit vs A/B test?** A/B test: fixed split, clean statistical answer, "regret" during the test. Bandit: shifts traffic to winners automatically → less regret, but harder statistical inference and sensitive to delayed rewards and non-stationarity. Use A/B for decisions you must measure precisely; bandits for continuous optimization (headlines, creatives, recommendations exploration).
@@ -165,7 +165,7 @@ def update(arm, clicked):
 
 **Q: Why the KL penalty?** Without it the model drifts far from natural language to exploit reward model weaknesses (**reward hacking**: overly long, flattering, repetitive outputs).
 
-**Q: Alternatives to PPO for LLMs?** DPO (no RL loop, directly on preference pairs), GRPO (group-relative advantages, no critic — used for reasoning models), RLAIF (AI feedback instead of human), **RL with verifiable rewards** (math answers checked, code run against tests).
+**Q: Alternatives to PPO for LLMs?** DPO (no RL loop, directly on preference pairs), GRPO (group-relative advantages, no critic; used for reasoning models), RLAIF (AI feedback instead of human), **RL with verifiable rewards** (math answers checked, code run against tests).
 
 **Q: What is reward hacking in general?** The agent finds a way to get high reward that the designer didn't intend (a boat racing game agent circling to collect points instead of finishing). The reward is a proxy; the agent optimizes the proxy, not the intention (**Goodhart's law**).
 
@@ -179,7 +179,7 @@ def update(arm, clicked):
 
 **Q: Safe RL?** Constraints on actions (action masking, safety layers), constrained MDPs (cost limits), human oversight, conservative offline training before online, shadow mode.
 
-**Q: How do you make RL experiments trustworthy?** Run multiple seeds (5–10), report mean ± confidence interval, use the same environment versions, log hyperparameters, compare with strong baselines (random, heuristic, tuned PPO).
+**Q: How do you make RL experiments trustworthy?** Run multiple seeds (5-10), report mean ± confidence interval, use the same environment versions, log hyperparameters, compare with strong baselines (random, heuristic, tuned PPO).
 
 ---
 
@@ -189,17 +189,17 @@ Use the C.L.H.I.F.P. method from [03-debugging-framework.md](03-debugging-framew
 
 ### The reward is not increasing at all
 **Causes (ranked):** reward is too sparse (agent never sees a positive reward); bug in the environment or reward function (wrong sign, reward never returned, `done` flag wrong); observations not normalized; learning rate wrong; exploration too low (ε decayed too fast, entropy too low); network too small or wrong architecture.
-**Isolate:** test on a trivial version of the task; run a random policy and a hand-coded policy — do they get different rewards? If not, the reward is broken. Print reward per step; check episode lengths; check observations aren't constant.
+**Isolate:** test on a trivial version of the task; run a random policy and a hand-coded policy. Do they get different rewards? If not, the reward is broken. Print reward per step; check episode lengths; check observations aren't constant.
 **Fix:** reward shaping or curriculum, curiosity bonus, demonstrations; normalize observations and rewards; tune LR, entropy coefficient; verify on a known-solvable env first with a reference implementation (e.g., Stable-Baselines3).
 **Prevent:** unit tests for env (reset/step contract), sanity runs on simple envs in CI.
 
 ### The agent gets high reward but behaves badly (reward hacking)
 **Causes:** reward is a proxy that misses the true goal; loophole in environment (physics bug, scoring bug); shaped reward dominates the real objective.
-**Isolate:** **watch videos/rollouts** — never trust only the reward curve. Compare reward with true task metrics (task success rate).
+**Isolate:** **watch videos/rollouts**. Never trust only the reward curve. Compare reward with true task metrics (task success rate).
 **Fix:** fix loopholes; redesign the reward (penalize the exploit, use potential-based shaping); add constraints; use human preferences or demonstrations to define the goal; KL penalty to a reference behavior.
 **Prevent:** track a separate "true success" metric; red-team the environment; human review of sample behavior.
 
-### Training is unstable — reward goes up, then collapses
+### Training is unstable: reward goes up, then collapses
 **Causes:** too-large policy updates (LR too high, PPO clip too wide); Q-value divergence (deadly triad); replay buffer too small (forgets) ; non-stationary targets (target network updates too often); catastrophic forgetting of earlier skills.
 **Isolate:** plot KL between policy updates, value loss, Q-value magnitudes, entropy, gradient norms. Exploding Q-values → divergence; entropy crash → premature convergence.
 **Fix:** lower LR, gradient clipping, smaller clip ε, more frequent checkpoints (keep best), Double DQN, slower target updates (Polyak), larger replay buffer, reward scaling/normalization.

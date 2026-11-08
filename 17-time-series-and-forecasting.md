@@ -1,4 +1,4 @@
-# 17 — Time Series & Forecasting
+# 17. Time Series & Forecasting
 
 Asked in retail, supply chain, finance, energy, ride-sharing, cloud capacity planning, and IoT interviews.
 
@@ -23,10 +23,10 @@ Asked in retail, supply chain, finance, energy, ride-sharing, cloud capacity pla
 **Q: What makes time series different from normal tabular data?** Observations are ordered and **dependent** on the past. You can't shuffle data randomly, and the future may behave differently from the past.
 
 **Q: Components of a time series?**
-- **Trend** — long-term increase/decrease.
-- **Seasonality** — repeating pattern with fixed period (daily, weekly, yearly).
-- **Cycles** — longer, irregular ups and downs (economic cycles).
-- **Noise / residual** — random variation.
+- **Trend:** long-term increase/decrease.
+- **Seasonality:** repeating pattern with fixed period (daily, weekly, yearly).
+- **Cycles:** longer, irregular ups and downs (economic cycles).
+- **Noise / residual:** random variation.
 Decomposition: additive `y = T + S + R` or multiplicative `y = T × S × R` (when seasonal swings grow with the level). STL is a robust decomposition method.
 
 **Q: Univariate vs multivariate forecasting?** Univariate uses only the series' own history. Multivariate uses other series or covariates (price, promotions, weather, holidays).
@@ -37,7 +37,7 @@ Decomposition: additive `y = T + S + R` or multiplicative `y = T × S × R` (whe
 
 **Q: Point vs probabilistic forecast?** Point = one number. Probabilistic = distribution or quantiles (P10, P50, P90). Business decisions (inventory, capacity) usually need uncertainty.
 
-**Q: Single (local) model vs global model?** Local: one model per series (ARIMA per product). Global: one model trained across many series (LightGBM or deep model over all products) — shares patterns, handles short series better, easier to maintain at scale.
+**Q: Single (local) model vs global model?** Local: one model per series (ARIMA per product). Global: one model trained across many series (LightGBM or deep model over all products). It shares patterns, handles short series better, easier to maintain at scale.
 
 **Q: Recursive vs direct multi-step forecasting?** Recursive: predict t+1, feed it back to predict t+2 (errors compound). Direct: separate model (or output) per horizon. MIMO/seq2seq: predict all horizons at once.
 
@@ -49,7 +49,7 @@ Decomposition: additive `y = T + S + R` or multiplicative `y = T × S × R` (whe
 
 **Q: ACF vs PACF?** ACF: correlation of the series with its lags (includes indirect effects). PACF: correlation with a lag after removing effects of shorter lags. Use for ARIMA order: PACF cuts off after p → AR(p); ACF cuts off after q → MA(q).
 
-**Q: What is a random walk and why does it matter?** y_t = y_{t−1} + noise. Best forecast is the last value (**naive forecast**). Many financial series behave like this — always compare models with a naive baseline.
+**Q: What is a random walk and why does it matter?** y_t = y_{t−1} + noise. Best forecast is the last value (**naive forecast**). Many financial series behave like this, so always compare models with a naive baseline.
 
 **Q: Baselines you must always try?** Naive (last value), seasonal naive (value same time last week/year), moving average, and drift. If your model doesn't beat seasonal naive, it isn't useful.
 
@@ -63,7 +63,7 @@ Decomposition: additive `y = T + S + R` or multiplicative `y = T × S × R` (whe
 
 **Q: Limits of classical models?** One model per series (doesn't scale to millions of SKUs easily), limited use of covariates, linear assumptions, struggle with multiple seasonalities and short histories.
 
-**Q: VAR?** Vector autoregression — multiple series that influence each other (e.g., interest rates and inflation).
+**Q: VAR?** Vector autoregression: multiple series that influence each other (e.g., interest rates and inflation).
 
 ## 4. Machine learning for time series
 
@@ -94,7 +94,7 @@ One global model over all series. This won many forecasting competitions (e.g., 
 
 **Q: When does deep learning beat gradient boosting?** Many related series, long histories, complex covariate interactions, need for probabilistic multi-horizon output. For small/medium tabular-style problems, LightGBM is often equal or better and much simpler.
 
-**Q: When use foundation models?** Quick baseline, little history, many diverse series, no time to build features. Fine-tune or ensemble with domain models; always backtest — zero-shot doesn't know your promotions.
+**Q: When use foundation models?** Quick baseline, little history, many diverse series, no time to build features. Fine-tune or ensemble with domain models; always backtest, because a zero-shot model doesn't know your promotions.
 
 ## 6. Validation: backtesting
 
@@ -116,14 +116,14 @@ Add a **gap** between train and test if features need time to become available (
 |---|---|---|
 | MAE | mean \|y − ŷ\| | in units, robust, easy to explain |
 | RMSE | sqrt(mean (y − ŷ)²) | punishes big errors |
-| MAPE | mean \|y − ŷ\| / \|y\| | % — **explodes when y near 0**, biased toward under-forecasting |
+| MAPE | mean \|y − ŷ\| / \|y\| | %; **explodes when y is near 0**, biased toward under-forecasting |
 | sMAPE | \|y−ŷ\| / ((\|y\|+\|ŷ\|)/2) | symmetric-ish, still unstable near 0 |
-| **WAPE** | Σ\|y − ŷ\| / Σ\|y\| | % of total volume — common in retail, stable |
+| **WAPE** | Σ\|y − ŷ\| / Σ\|y\| | % of total volume; common in retail, stable |
 | **MASE** | MAE / MAE of seasonal naive | <1 means better than naive; scale-free, safe near 0 |
 | Bias | Σ(ŷ − y) / Σy | systematic over/under-forecasting |
 | **Quantile (pinball) loss** | asymmetric loss per quantile | for probabilistic forecasts |
 | CRPS | | full distribution quality |
-| Coverage | % actuals inside prediction interval | P10–P90 should cover ~80% |
+| Coverage | % actuals inside prediction interval | P10-P90 should cover ~80% |
 
 **Q: How to pick a metric?** From the business cost. Over-stock vs stock-out costs differ → forecast a quantile (e.g., P70) and evaluate with pinball loss. Report error weighted by volume or revenue so important items count more.
 
@@ -138,11 +138,11 @@ Add a **gap** between train and test if features need time to become available (
 ## 9. Hierarchical & intermittent demand
 
 **Q: What is hierarchical forecasting?** Series form a hierarchy (product → category → total; store → region → country). Forecasts at different levels must add up (**coherence**).
-Approaches: bottom-up (sum low-level forecasts — noisy), top-down (split total by proportions — loses detail), middle-out, and **reconciliation** (MinT — optimally combine all levels).
+Approaches: bottom-up (sum low-level forecasts; noisy), top-down (split the total by proportions; loses detail), middle-out, and **reconciliation** (MinT, which combines all levels optimally).
 
 **Q: Intermittent demand (many zeros)?** Spare parts, slow-moving SKUs. Methods: Croston's method (forecast size and interval separately), SBA/TSB variants, Tweedie/zero-inflated models, aggregate to weekly/monthly. Evaluate with MASE/pinball, not MAPE.
 
-**Q: Cold start — new product with no history?** Use similar products (by attributes/embeddings) as analogs, category-level curves, launch plans and price as features, global models with static features; update quickly as real sales arrive.
+**Q: Cold start: a new product with no history?** Use similar products (by attributes/embeddings) as analogs, category-level curves, launch plans and price as features, global models with static features; update quickly as real sales arrive.
 
 ## 10. Time series anomaly detection
 
@@ -181,7 +181,7 @@ Monitoring: accuracy by category/store as actuals arrive, bias, drift, missing d
 ## 12. What-if scenarios
 
 ### The forecast broke after a big shock (COVID-like event, new competitor, a massive holiday shift)
-**Causes:** structural break — the past no longer represents the future; models use long history that is now misleading; lag features copy abnormal values forward.
+**Causes:** structural break. The past no longer represents the future; models use long history that is now misleading; lag features copy abnormal values forward.
 **Isolate:** plot residuals over time; check if error rose for all series at once (global shock) or some segments.
 **Fix (now):** shorter training window or heavier weight on recent data, manual planner overrides, switch to faster-adapting models (exponential smoothing), widen prediction intervals.
 **Fix (long-term):** add "shock" indicator features, exclude or flag the abnormal period in training later, scenario forecasting, retrain more often.
@@ -196,7 +196,7 @@ Monitoring: accuracy by category/store as actuals arrive, bias, drift, missing d
 See §9 cold start: analog products, attribute-based global model, category curves, launch plan inputs, fast updating with first sales, wider intervals.
 
 ### MAPE is huge and unstable
-**Cause:** many actual values near zero (low-volume items, intermittent demand) — dividing by tiny numbers.
+**Cause:** many actual values near zero (low-volume items, intermittent demand), so you divide by tiny numbers.
 **Fix:** switch to WAPE, MASE, or weighted metrics; evaluate low-volume items separately; aggregate level for reporting; use pinball loss for decisions.
 
 ### Forecast is accurate overall, but bad for specific stores/products
