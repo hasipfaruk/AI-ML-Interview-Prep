@@ -106,7 +106,8 @@ def build_html():
     return f"""<!doctype html><html><head><meta charset="utf-8"><title>{TITLE}</title>
 <style>{css}</style></head><body>
 <div class="cover"><h1>{TITLE}</h1>
-<p>System design · ML · Deep learning · NLP &amp; LLMs · Computer vision · Statistics · Coding · MLOps · Behavioral</p>
+<p>System design · ML · Deep learning · NLP &amp; LLMs · Computer vision · RL · Time series · Recommenders · Speech · Graph ML · GenAI &amp; agents</p>
+<p>Statistics · Coding · SQL &amp; data engineering · Cloud · MLOps · Security · Product sense · Leadership · 20 industries</p>
 <p>With "what if this happens?" scenario answers for every topic</p></div>
 <div class="toc"><h1>Contents</h1><ol>{''.join(toc_items)}</ol></div>
 {chapters}

@@ -1,6 +1,6 @@
 # AI / ML / DL / NLP Interview Prep — Zero to Hero
 
-A complete prep course for **AI Engineer, ML Engineer, Applied Scientist, Data Scientist, NLP / CV / LLM Engineer** interviews.
+A complete prep course for **AI Engineer, ML Engineer, Applied Scientist, Data Scientist, NLP / CV / LLM / Speech / RL Engineer, MLOps, Data Engineer and Backend/Software Engineer** interviews — across **every industry** (healthcare, finance, e-commerce, ads, autonomous driving, manufacturing, and 14 more).
 
 📄 **Prefer one file?** Download the full course as a PDF: [AI-ML-Interview-Prep.pdf](AI-ML-Interview-Prep.pdf)
 
@@ -25,6 +25,20 @@ Most candidates don't fail because they lack knowledge. They fail because when t
 | **MLOps / production** | CI/CD for ML, serving, monitoring, versioning | [13-mlops.md](13-mlops.md) |
 | **Project deep dive & behavioral** | your own projects, STAR stories | [15-behavioral-and-project-deep-dive.md](15-behavioral-and-project-deep-dive.md) |
 | **Interview day strategy** | 45-min script, phrases, cheat sheet | [06-interview-playbook.md](06-interview-playbook.md) |
+| **Reinforcement learning & bandits** | MDPs, Q-learning, PPO, exploration, RLHF | [16-reinforcement-learning.md](16-reinforcement-learning.md) |
+| **Time series & forecasting** | ARIMA, backtesting, demand forecasting, anomalies | [17-time-series-and-forecasting.md](17-time-series-and-forecasting.md) |
+| **Recommender systems** | collaborative filtering, two-tower, ranking, bias, cold start | [18-recommender-systems.md](18-recommender-systems.md) |
+| **Speech & audio** | ASR, TTS, WER, voice agents | [19-speech-and-audio.md](19-speech-and-audio.md) |
+| **Graph ML** | GNNs, knowledge graphs, GraphRAG, fraud rings | [20-graph-ml.md](20-graph-ml.md) |
+| **Generative & multimodal AI** | diffusion, vision-language models, multimodal RAG | [21-generative-and-multimodal-ai.md](21-generative-and-multimodal-ai.md) |
+| **AI agents** | tool use, planning, memory, agent evaluation & platforms | [22-ai-agents.md](22-ai-agents.md) |
+| **Industry / domain rounds** | how AI is used and questioned in 20 industries | [23-industry-playbooks.md](23-industry-playbooks.md) |
+| **General system design (any engineer)** | news feed, video streaming, ride-hailing, payments, Google Docs… | [24-classic-system-design-cases.md](24-classic-system-design-cases.md) |
+| **Data engineering & SQL** | modeling, pipelines, Spark, 20+ SQL problems | [25-data-engineering-and-sql.md](25-data-engineering-and-sql.md) |
+| **Cloud & infrastructure** | AWS/GCP/Azure, Kubernetes, GPUs, cost | [26-cloud-and-infrastructure-for-ml.md](26-cloud-and-infrastructure-for-ml.md) |
+| **Security, privacy & responsible AI** | attacks on ML, privacy law, fairness, governance | [27-security-privacy-responsible-ai.md](27-security-privacy-responsible-ai.md) |
+| **AI product sense** | framing problems, metrics, ROI, AI UX | [28-ai-product-sense.md](28-ai-product-sense.md) |
+| **Senior / staff / lead rounds** | strategy, leadership, hiring, incidents | [29-senior-and-leadership.md](29-senior-and-leadership.md) |
 
 ---
 
@@ -52,6 +66,14 @@ Read [03-debugging-framework.md](03-debugging-framework.md) **first**. It works 
 | 9 | 05 Case studies 5–11 + 15 project prep | 2 full mock interviews |
 | 10 | 06 playbook, revise weak areas | 4 mock interviews (mixed rounds) |
 
+### Weeks 11–14 — specialize (pick what fits your target job)
+| Week | Track A: AI specialist | Track B: Software / data | Track C: Senior roles |
+|---|---|---|---|
+| 11 | 18 Recommenders or 19 Speech or 16 RL | 24 Classic cases 1–7 | 28 Product sense |
+| 12 | 21 Generative & 22 Agents | 24 Classic cases 8–20 | 29 Leadership |
+| 13 | 17 Time series or 20 Graph ML | 25 Data engineering & SQL | 27 Security & responsible AI |
+| 14 | 23 Your industry + 27 | 26 Cloud & infra | 23 Your industry + mocks |
+
 ### 2-week emergency plan (interview soon)
 | Days | Focus |
 |---|---|
@@ -71,7 +93,18 @@ Read [03-debugging-framework.md](03-debugging-framework.md) **first**. It works 
 | **Data Scientist / Applied Scientist** | 07, 11, 12, 08, 15, 05 (#4–5) |
 | **NLP Engineer** | 09, 08, 12, 04 (A–B), 02 |
 | **CV Engineer** | 10, 08, 12, 13, 05 (#7–8) |
-| **MLOps Engineer** | 13, 02, 01, 04 (C–E), 05 (#3) |
+| **MLOps Engineer** | 13, 26, 02, 01, 04 (C–E), 05 (#3) |
+| **Recommender / Ranking Engineer** | 18, 07, 11, 05 (#4, #6), 23 (e-commerce, ads, media) |
+| **Speech / Voice AI Engineer** | 19, 08, 09, 22, 12 |
+| **RL / Robotics Engineer** | 16, 08, 10, 23 (autonomous vehicles) |
+| **Forecasting / Quant / Supply-chain DS** | 17, 07, 11, 25, 23 (finance, logistics, energy) |
+| **GenAI / Agents Engineer** | 22, 21, 09, 02, 04, 27, 28 |
+| **Data Engineer** | 25, 26, 01, 24, 13 |
+| **Backend / Software Engineer** | 01, 24, 05 (#9–11), 14, 26 |
+| **Senior / Staff / Lead / Manager** | 29, 28, 06, 15, plus your role's files |
+
+### Interviewing in a specific industry?
+Read the general files for your role, then your industry in [23-industry-playbooks.md](23-industry-playbooks.md). Its last table tells you which other chapters matter most for that industry.
 
 ---
 
@@ -99,6 +132,20 @@ Read [03-debugging-framework.md](03-debugging-framework.md) **first**. It works 
 | 13 | [MLOps](13-mlops.md) |
 | 14 | [DSA coding round](14-dsa-coding-round.md) |
 | 15 | [Behavioral & project deep dive](15-behavioral-and-project-deep-dive.md) |
+| 16 | [Reinforcement learning & bandits](16-reinforcement-learning.md) |
+| 17 | [Time series & forecasting](17-time-series-and-forecasting.md) |
+| 18 | [Recommender systems](18-recommender-systems.md) |
+| 19 | [Speech & audio](19-speech-and-audio.md) |
+| 20 | [Graph ML](20-graph-ml.md) |
+| 21 | [Generative & multimodal AI](21-generative-and-multimodal-ai.md) |
+| 22 | [AI agents](22-ai-agents.md) |
+| 23 | [Industry playbooks (20 industries)](23-industry-playbooks.md) |
+| 24 | [Classic system design cases](24-classic-system-design-cases.md) |
+| 25 | [Data engineering & SQL](25-data-engineering-and-sql.md) |
+| 26 | [Cloud & infrastructure for ML](26-cloud-and-infrastructure-for-ml.md) |
+| 27 | [Security, privacy & responsible AI](27-security-privacy-responsible-ai.md) |
+| 28 | [AI product sense](28-ai-product-sense.md) |
+| 29 | [Senior & leadership rounds](29-senior-and-leadership.md) |
 
 ---
 
